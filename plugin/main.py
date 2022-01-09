@@ -63,8 +63,8 @@ class Playnite(Flox):
 
     def source_filter(self, query):
         if query == '':
-            sources = set([game.source for game in self.games])
-            for source in sources:
+            sources = [game.source['Name'] for game in self.games]
+            for source in set(sources):
                 _ = self.add_item(
                     title=f'{SOURCE_FILTER}{source}',
                     subtitle='Filter by source.',
@@ -73,8 +73,9 @@ class Playnite(Flox):
                     dont_hide=True,
                 )
                 _['JsonRPCAction']['Parameters'] = [_['AutoCompleteText']]
+                self.games = []
             return
-        self.games = [game for game in self.games if query.lower() in game.source.lower()]
+        self.games = [game for game in self.games if query.lower() in game.source['Name'].lower()]
 
     def install_filter(self, query):
         self.games = [game for game in self.games if not game.is_installed]
@@ -84,7 +85,6 @@ class Playnite(Flox):
         try:
             self.games = pn.import_games(self.playnite_path)
         except FileNotFoundError:
-
             return
         if query.startswith(SOURCE_FILTER):
             query = query[len(SOURCE_FILTER):]
