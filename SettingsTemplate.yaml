@@ -1,0 +1,12 @@
+body:
+  - type: textBlock
+    attributes:
+      name: description
+      description: >
+        Search & launch your Playnite library.
+  - type: input
+    attributes:
+      name: playnite_path
+      label: 'Playnite User Directory:'
+      description: Location of Playnite user folder
+      defaultValue: ""

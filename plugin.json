@@ -1,0 +1,12 @@
+{
+    "ID": "625A2812D5364D708582FDD9ACCD8C93",
+    "ActionKeyword": "pn",
+    "Name": "Playnite",
+    "Description": "Search and launch your Playnite library.",
+    "Author": "Garulf",
+    "Version": "0.2.0",
+    "Language": "python",
+    "Website": "https://github.com/Garulf/playnite",
+    "IcoPath": "./icon.png",
+    "ExecuteFileName": "run.py"
+}
