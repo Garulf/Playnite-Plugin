@@ -6,7 +6,7 @@
     "Author": "Garulf",
     "Version": "0.2.0",
     "Language": "python",
-    "Website": "https://github.com/Garulf/playnite",
+    "Website": "https://github.com/Garulf/playnite-plugin",
     "IcoPath": "./icon.png",
     "ExecuteFileName": "run.py"
 }
