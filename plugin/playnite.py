@@ -33,6 +33,10 @@ class Game(object):
             elif value == 'False':
                 value = False
             setattr(self, camel_to_snake(key).lower(), value)
+        if self.source is None:
+            self.source = {
+                'Name': 'Unknown',
+            }
 
     @property
     def start_uri(self):
