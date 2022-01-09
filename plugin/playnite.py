@@ -4,7 +4,7 @@ import os
 import webbrowser
 
 
-SCRIPT_NAME = 'FlowLauncher_Exporter'
+SCRIPT_NAME = 'FlowLauncherExporter'
 DATA_FOLDER = Path(os.getenv('APPDATA'), 'Playnite')
 PLUGIN_NAME = 'FlowLauncher_Exporter'
 
