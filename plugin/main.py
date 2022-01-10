@@ -26,21 +26,22 @@ class Playnite(Flox):
             self.playnite_path = str(pn.DATA_FOLDER)
             self.settings['playnite_path'] = str(pn.DATA_FOLDER)
         self.hide_uninstalled = self.settings.get('hide_uninstalled', True)
-        if not Path(self.playnite_path).exists():
-            self.add_item(
-                title='Library file not found!',
-                subtitle="Please set the path to Playnite\'s data directory in settings.",
-                icon=ICON_SETTINGS,
-                method=self.open_setting_dialog
-            )
-            self.add_item(
-                title='Install FlowLauncherExporter plugin.',
-                subtitle='FlowLauncherExporter plugin is required to use this plugin.',
-                icon='',
-                method=self.uri,
-                parameters=[PLUGIN_URI]
 
-            )
+    def missing_library(self):
+        self.add_item(
+            title='Library file not found!',
+            subtitle="Please set the path to Playnite\'s data directory in settings.",
+            icon=ICON_SETTINGS,
+            method=self.open_setting_dialog
+        )
+        self.add_item(
+            title='Install FlowLauncherExporter plugin.',
+            subtitle='FlowLauncherExporter plugin is required to use this plugin.',
+            icon='',
+            method=self.uri,
+            parameters=[PLUGIN_URI]
+
+        )
 
     def main_search(self, query):
         for game in self.games:
@@ -82,13 +83,14 @@ class Playnite(Flox):
         self.games = [game for game in self.games if not game.is_installed]
 
     def uninstalled_filter(self):
-        self.games = [game for game in self.games if game.is_installed or game.install_directory != None]
+        self.games = [game for game in self.games if game.is_installed and (game.install_directory != None or game.install_directory != "")]
 
     def query(self, query):
         self.load_settings()
         try:
             self.games = pn.import_games(self.playnite_path)
         except FileNotFoundError:
+            self.missing_library()
             return
         if query.startswith(SOURCE_FILTER):
             query = query[len(SOURCE_FILTER):]
