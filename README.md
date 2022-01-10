@@ -13,7 +13,7 @@ Type: `#` to filter by a specific Source
 
 ## Filter by install status:
 
-Type: `@` to filter by uninstalled games.
+Type: `@` to show all games including uninstalled games.
 
 ![image](https://user-images.githubusercontent.com/535299/148699085-56630f78-5f35-4ecf-8866-cc9324032bae.png)
 
