@@ -10,3 +10,14 @@ body:
       label: 'Playnite User Directory:'
       description: Location of Playnite user folder
       defaultValue: ""
+  - type: checkbox
+    attributes:
+      name: hide_uninstalled
+      label: 'Hide Uninstalled:'
+      defaultValue: "true"
+      description: Hides uninstalled from default results
+  - type: textBlock
+    attributes:
+      name: description
+      description: >
+        Hide Games that are currently not installed from defautl results. You can unhide them temporarily by using the "@" keyword.

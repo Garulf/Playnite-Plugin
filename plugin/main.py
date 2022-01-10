@@ -25,6 +25,7 @@ class Playnite(Flox):
         if self.settings.get('playnite_path') == '':
             self.playnite_path = str(pn.DATA_FOLDER)
             self.settings['playnite_path'] = str(pn.DATA_FOLDER)
+        self.hide_uninstalled = self.settings.get('hide_uninstalled', True)
         if not Path(self.playnite_path).exists():
             self.add_item(
                 title='Library file not found!',
@@ -77,8 +78,11 @@ class Playnite(Flox):
             return
         self.games = [game for game in self.games if query.lower() in game.source['Name'].lower()]
 
-    def install_filter(self, query):
+    def install_filter(self):
         self.games = [game for game in self.games if not game.is_installed]
+
+    def uninstalled_filter(self):
+        self.games = [game for game in self.games if game.is_installed or game.install_directory != None]
 
     def query(self, query):
         self.load_settings()
@@ -89,9 +93,11 @@ class Playnite(Flox):
         if query.startswith(SOURCE_FILTER):
             query = query[len(SOURCE_FILTER):]
             self.source_filter(query)
-        if query.startswith(INSTALL_FILTER):
+        elif query.startswith(INSTALL_FILTER):
             query = query[len(SOURCE_FILTER):]
-            self.install_filter(query)
+            self.install_filter()
+        elif self.hide_uninstalled:
+            self.uninstalled_filter()
         self.main_search(query)
         
 
