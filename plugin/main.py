@@ -82,7 +82,7 @@ class Playnite(Flox):
         self.games = [game for game in self.games if not game.is_installed]
 
     def uninstalled_filter(self):
-        self.games = [game for game in self.games if game.is_installed or game.install_directory != None]
+        self.games = [game for game in self.games if game.is_installed and (game.install_directory != None or game.install_directory != "")]
 
     def query(self, query):
         self.load_settings()
