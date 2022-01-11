@@ -1,4 +1,4 @@
-[![PR-Tester](https://github.com/Garulf/Playnite-Plugin/actions/workflows/pr-tester.yml/badge.svg)](https://github.com/Garulf/Playnite-Plugin/actions/workflows/pr-tester.yml)
+[![Test](https://github.com/Garulf/Playnite-Plugin/actions/workflows/pr-tester.yml/badge.svg)](https://github.com/Garulf/Playnite-Plugin/actions/workflows/pr-tester.yml)
 # Playnite-Plugin
 Search and launch your Playnite library.
 
