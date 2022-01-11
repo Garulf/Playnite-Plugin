@@ -23,3 +23,5 @@ Type: `@` to show all games including uninstalled games.
 
 ![image](https://user-images.githubusercontent.com/535299/148699103-969410f3-9ad0-45f6-b1f9-d47fa58ee57a.png)
 
+##
+<a href="https://www.buymeacoffee.com/garulf" target="_blank"><img src="https://cdn.buymeacoffee.com/buttons/v2/default-green.png" alt="Buy Me A Coffee" style="height: 60px !important;width: 217px !important;" ></a>
