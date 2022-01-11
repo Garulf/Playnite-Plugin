@@ -61,4 +61,3 @@ jobs:
           echo ${{ env.PLUGIN_PATH }}
           echo ${{steps.exe.outputs.prop}}
           python ${{steps.exe.outputs.prop}}
-
