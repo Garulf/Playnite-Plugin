@@ -1,6 +1,6 @@
 name: "Test"
 on:
-  [pull_request, workflow_dispatch]
+  [pull_request, workflow_dispatch, push]
 env:
   PYTHON_VER: 3.8
 jobs:
