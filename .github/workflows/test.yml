@@ -57,7 +57,7 @@ jobs:
           python -m pip install --upgrade pip
           pip install wheel
           pip install -r ./requirements.txt -t ./lib
-      - name: Get Plugin's version
+      - name: Get Plugin's Execute file
         id: exe
         uses: notiz-dev/github-action-json-property@release
         with: 
