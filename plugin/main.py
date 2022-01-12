@@ -8,7 +8,7 @@ import playnite as pn
 
 SOURCE_FILTER = '#'
 INSTALL_FILTER = '@'
-SCORE_CUTOFF = 10
+SCORE_CUTOFF = 15
 PLUGIN_URI = 'playnite://playnite/installaddon/FlowLauncherExporter'
 
 def match(query, text):
