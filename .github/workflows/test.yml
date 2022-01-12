@@ -1,6 +1,14 @@
 name: "Test"
 on:
-  [pull_request, workflow_dispatch, push]
+  pull_request: 
+  workflow_dispatch: 
+  push:
+    tags-ignore:
+      - 'v*'
+    paths-ignore: 
+      - .github/workflows/*
+      - README.md
+      - assets/*
 env:
   PYTHON_VER: 3.8
 jobs:
