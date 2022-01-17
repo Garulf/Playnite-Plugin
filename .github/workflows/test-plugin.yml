@@ -36,6 +36,7 @@ jobs:
         if: ${{ github.ref != 'refs/heads/main' }}
         run: |
           $release_ver = (Invoke-WebRequest -Uri "https://raw.githubusercontent.com/${{github.repository}}/${{env.BRANCH}}/plugin.json" | ConvertFrom-Json).Version
+          $release_ver = $release_ver -replace "v", "" 
           $this_ver = ${{steps.version.outputs.prop}}
           if ([version]$this_ver -gt [version]$release_ver) {
             exit 0
