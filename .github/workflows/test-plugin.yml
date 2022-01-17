@@ -27,7 +27,7 @@ jobs:
           path: ${{github.event.repository.name}}
       - name: Get latest Version tag
         run: |
-          if (${{matrix.flow_tags}} == 'latest') {
+          if ("${{matrix.flow_tags}}" == 'latest') {
             $url = "https://api.github.com/repos/Flow-Launcher/Flow.Launcher/releases/latest"
           } else {
             $url = "https://api.github.com/repos/Flow-Launcher/Flow.Launcher/releases/tags/${{matrix.flow_tags}}"
