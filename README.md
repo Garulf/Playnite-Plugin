@@ -1,4 +1,4 @@
-[![Test](https://github.com/Garulf/Playnite-Plugin/actions/workflows/test.yml/badge.svg)](https://github.com/Garulf/Playnite-Plugin/actions/workflows/test.yml)
+[![Test Plugin](https://github.com/Garulf/Playnite-Plugin/actions/workflows/test-plugin.yml/badge.svg)](https://github.com/Garulf/Playnite-Plugin/actions/workflows/test-plugin.yml)
 # Playnite-Plugin
 Search and launch your Playnite library.
 
