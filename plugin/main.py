@@ -85,6 +85,9 @@ class Playnite(Flox):
     def uninstalled_filter(self):
         self.games = [game for game in self.games if game.is_installed and (game.install_directory != None or game.install_directory != "")]
 
+    def remove_hidden(self):
+        self.games = [game for game in self.games if not game.hidden]
+
     def query(self, query):
         self.load_settings()
         try:
@@ -100,6 +103,7 @@ class Playnite(Flox):
             self.install_filter()
         elif self.hide_uninstalled:
             self.uninstalled_filter()
+        self.remove_hidden()
         self.main_search(query)
         
 

@@ -27,6 +27,7 @@ class Game(object):
     def __init__(self, data_folder, data) -> None:
         self.data_folder = data_folder
         self.data = data
+        self.hidden = False
         for key, value in data.items():
             if value == 'True':
                 value = True
