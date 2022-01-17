@@ -8,14 +8,13 @@ import playnite as pn
 
 SOURCE_FILTER = '#'
 INSTALL_FILTER = '@'
-HIDDEN_FILTER = '!'
 SCORE_CUTOFF = 10
 PLUGIN_URI = 'playnite://playnite/installaddon/FlowLauncherExporter'
 
 def match(query, text):
     return int(SM(
                 lambda x: x == " ", 
-                query, 
+                query.lower(), 
                 text.lower()).ratio() * 100
             )
 
@@ -66,13 +65,8 @@ class Playnite(Flox):
 
     def source_filter(self, query):
         sources = [game.source['Name'] for game in self.games]
-        sources = set(sources)
-        for source in sources:
-            if source.lower() in query:
-                query = query.replace(source.lower(), '').lstrip()
-                self.games = [game for game in self.games if source.lower() == game.source['Name'].lower()]
-                break
-            if query in source.lower() or query == '':
+        if query == '':
+            for source in set(sources):
                 _ = self.add_item(
                     title=f'{SOURCE_FILTER}{source}',
                     subtitle='Filter by source.',
@@ -81,9 +75,13 @@ class Playnite(Flox):
                     dont_hide=True,
                 )
                 _['JsonRPCAction']['Parameters'] = [f"{_['AutoCompleteText']} "]
-        else:
-            self.games = []
-        return query
+                self.games = []
+            return q
+        for source in sources:
+            if source.lower() == query.lower():
+                self.games = [game for game in self.games if query.lower() == game.source['Name'].lower()]
+                return query.lower().replace(source.lower(), '')
+
 
     def install_filter(self):
         self.games = [game for game in self.games if not game.is_installed]
@@ -96,7 +94,6 @@ class Playnite(Flox):
 
     def query(self, query):
         self.load_settings()
-        query = query.lower()
         try:
             self.games = pn.import_games(self.playnite_path)
         except FileNotFoundError:
@@ -104,16 +101,13 @@ class Playnite(Flox):
             return
         if query.startswith(SOURCE_FILTER):
             query = query[len(SOURCE_FILTER):]
-            query = self.source_filter(query)
-        if INSTALL_FILTER in query:
-            query = query.replace(INSTALL_FILTER, '')
+            self.source_filter(query)
+        elif query.startswith(INSTALL_FILTER):
+            query = query[len(INSTALL_FILTER):]
             self.install_filter()
         elif self.hide_uninstalled:
             self.uninstalled_filter()
-        if HIDDEN_FILTER not in query:
-            self.remove_hidden()
-        else:
-            query = query.replace(HIDDEN_FILTER, '')
+        self.remove_hidden()
         self.main_search(query)
         
 
