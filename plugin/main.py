@@ -8,6 +8,7 @@ import playnite as pn
 
 SOURCE_FILTER = '#'
 INSTALL_FILTER = '@'
+HIDDEN_FILTER = '!'
 SCORE_CUTOFF = 10
 PLUGIN_URI = 'playnite://playnite/installaddon/FlowLauncherExporter'
 
@@ -109,7 +110,10 @@ class Playnite(Flox):
             self.install_filter()
         elif self.hide_uninstalled:
             self.uninstalled_filter()
-        self.remove_hidden()
+        if HIDDEN_FILTER not in query:
+            self.remove_hidden()
+        else:
+            query = query.replace(HIDDEN_FILTER, '')
         self.main_search(query)
         
 
