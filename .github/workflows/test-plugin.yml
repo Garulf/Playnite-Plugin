@@ -18,7 +18,7 @@ jobs:
     runs-on: windows-latest
     strategy:
       matrix:
-        flow_tags: ['v1.9.1']
+        flow_tags: ['latest']
         python_ver: ['3.6', '3.7', '3.8', '3.9', '3.10']
     steps:
       - name: Checkout Plugin Repo
