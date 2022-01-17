@@ -27,13 +27,13 @@ jobs:
           path: ${{github.event.repository.name}}
       - name: Get latest Version tag
         run: |
-          $tag_name = ${{matrix.flow_tags}}
-          if ($tag_name == 'latest') {
+          if (${{matrix.flow_tags}} == 'latest') {
             $url = "https://api.github.com/repos/Flow-Launcher/Flow.Launcher/releases/latest"
           } else {
-            $url = "https://api.github.com/repos/Flow-Launcher/Flow.Launcher/releases/tags/$tag_name"
+            $url = "https://api.github.com/repos/Flow-Launcher/Flow.Launcher/releases/tags/${{matrix.flow_tags}}"
           }
           $release = Invoke-WebRequest -Uri $url | ConvertFrom-Json
+          $tag_name = $release.tag_name
           foreach ($asset in $release.assets)
           {
             if($asset.name -like '*setup.exe') {
@@ -44,6 +44,7 @@ jobs:
           }
           echo "DOWNLOAD_URL=$download_url" | Out-File -FilePath $Env:GITHUB_ENV -Encoding utf-8 -Append
           echo "FILE_NAME=$file_name" | Out-File -FilePath $Env:GITHUB_ENV -Encoding utf-8 -Append
+          echo "TAG_NAME=$tag_name" | Out-File -FilePath $Env:GITHUB_ENV -Encoding utf-8 -Append
       - name: Flow Launcher Cache
         uses: actions/cache@v2
         id: flow_cache
@@ -52,7 +53,7 @@ jobs:
             ~\AppData\Roaming\FlowLauncher\*
             !~\AppData\Roaming\FlowLauncher\Plugins\*
             ~\AppData\Local\FlowLauncher\**
-          key: ${{ runner.os }}-flow-${{ matrix.flow_tags }}
+          key: ${{ runner.os }}-flow-${{ env.TAG_NAME }}
       - name: Download Flow Launcher
         id: download
         if: steps.flow_cache.outputs.cache-hit != 'true'
