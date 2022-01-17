@@ -104,8 +104,8 @@ class Playnite(Flox):
         if query.startswith(SOURCE_FILTER):
             query = query[len(SOURCE_FILTER):]
             query = self.source_filter(query)
-        elif query.startswith(INSTALL_FILTER):
-            query = query[len(INSTALL_FILTER):]
+        if INSTALL_FILTER in query:
+            query = query.replace(INSTALL_FILTER, '')
             self.install_filter()
         elif self.hide_uninstalled:
             self.uninstalled_filter()
