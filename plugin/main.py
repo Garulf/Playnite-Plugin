@@ -110,7 +110,6 @@ class Playnite(Flox):
         elif self.hide_uninstalled:
             self.uninstalled_filter()
         self.remove_hidden()
-        self.logger.warning(query)
         self.main_search(query)
         
 
