@@ -27,7 +27,13 @@ jobs:
           path: ${{github.event.repository.name}}
       - name: Get latest Version tag
         run: |
-          $release = Invoke-WebRequest -Uri "https://api.github.com/repos/Flow-Launcher/Flow.Launcher/releases/tags/${{matrix.flow_tags}}" | ConvertFrom-Json
+          $tag_name = ${{matrix.flow_tags}}
+          if ($tag_name == 'latest') {
+            $url = "https://api.github.com/repos/Flow-Launcher/Flow.Launcher/releases/latest"
+          } else {
+            $url = "https://api.github.com/repos/Flow-Launcher/Flow.Launcher/releases/tags/$tag_name"
+          }
+          $release = Invoke-WebRequest -Uri $url | ConvertFrom-Json
           foreach ($asset in $release.assets)
           {
             if($asset.name -like '*setup.exe') {
