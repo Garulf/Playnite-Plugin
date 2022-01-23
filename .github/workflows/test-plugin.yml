@@ -19,12 +19,32 @@ jobs:
     strategy:
       matrix:
         flow_tags: ['latest']
-        python_ver: ['3.6', '3.7', '3.8', '3.9', '3.10']
+        python_ver: ['3.8']
     steps:
       - name: Checkout Plugin Repo
         uses: actions/checkout@v2
         with:
           path: ${{github.event.repository.name}}
+      - name: Get Plugin's version
+        if: ${{ github.ref != 'refs/heads/main' }}
+        id: version
+        uses: notiz-dev/github-action-json-property@release
+        with: 
+          path: './${{github.event.repository.name}}/plugin.json'
+          prop_path: 'Version'
+      - name: Assert Version updated
+        if: ${{ github.ref != 'refs/heads/main' }}
+        run: |
+          $release_ver = (Invoke-WebRequest -Uri "https://raw.githubusercontent.com/${{github.repository}}/main/plugin.json" | ConvertFrom-Json).Version
+          $release_ver = $release_ver -replace "v", "" 
+          $this_ver = "${{steps.version.outputs.prop}}"
+          echo "This version:" $this_ver
+          echo "Release version:" $release_ver
+          if ([System.Version]$this_ver -gt [System.Version]$release_ver) {
+            exit 0
+          } else {
+            exit 1
+          }
       - name: Get latest Version tag
         run: |
           if ("${{matrix.flow_tags}}" -eq 'latest') {
