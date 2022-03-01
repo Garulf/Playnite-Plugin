@@ -20,6 +20,7 @@ Copy and paste this into your browser to automatically start installation.
 ![image](https://user-images.githubusercontent.com/535299/148974556-75f6c392-3000-4bf6-8e50-c3cfd38570fd.png)
 </details>
 
+Lastly, in Flow's configuration panel, under "Plugins" and "Playnite", set the "Playnite user directory", which should look like "C:\Users\%USER_NAME%\AppData\Roaming\Playnite".
 ## How-To:
 
 Simply type the default keyword: `pn` and search your Playnite library.
