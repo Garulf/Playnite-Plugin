@@ -23,9 +23,6 @@ class Playnite(Flox):
 
     def load_settings(self):
         self.playnite_path = self.settings.setdefault('playnite_path', str(pn.DATA_FOLDER))
-        if self.settings.get('playnite_path') == '':
-            self.playnite_path = str(pn.DATA_FOLDER)
-            self.settings['playnite_path'] = str(pn.DATA_FOLDER)
         self.hide_uninstalled = self.settings.get('hide_uninstalled', True)
 
     def missing_library(self):
