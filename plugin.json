@@ -4,7 +4,7 @@
     "Name": "Playnite",
     "Description": "Search and launch your Playnite library.",
     "Author": "Garulf",
-    "Version": "1.5.1",
+    "Version": "1.5.2",
     "Language": "python",
     "Website": "https://github.com/Garulf/playnite-plugin",
     "IcoPath": "./icon.png",
