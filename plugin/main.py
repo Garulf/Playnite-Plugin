@@ -1,8 +1,7 @@
 import webbrowser
 from pathlib import Path
-from difflib import SequenceMatcher as SM
 
-from flox import Flox, ICON_SETTINGS
+from flox import Flox
 from playnite import DEFAULT_PLAYNITE_DIR, PlayniteApp
 from result import Result
 from filters import IsInstalled, IsHidden

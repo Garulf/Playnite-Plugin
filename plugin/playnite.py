@@ -3,10 +3,8 @@ from __future__ import annotations
 import json
 from pathlib import Path
 import os
-import webbrowser
-from datetime import datetime, timedelta
 from dataclasses import dataclass, field
-from typing import TypedDict, List
+from typing import List
 from filters import LibraryFilter, filter_game, IsID
 from game import Game, ID
 
