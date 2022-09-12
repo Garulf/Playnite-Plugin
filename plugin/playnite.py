@@ -10,10 +10,12 @@ from typing import TypedDict
 from filters import LibraryFilter, filter_game, IsHidden, IsInstalled, IsSource
 
 
-
+PLAYNITE_DIR_NAME = 'Playnite'
 SCRIPT_NAME = 'FlowLauncherExporter'
-PLAYNITE_DIR = Path(os.getenv('APPDATA'), 'Playnite')
-PLUGIN_NAME = 'FlowLauncher_Exporter'
+DEFAULT_PLAYNITE_DIR = Path(os.getenv('APPDATA'), PLAYNITE_DIR_NAME)
+EXTENSION_DATA = 'ExtensionsData'
+LIBRARY_FILE = 'library.json'
+PLUGIN_NAME = 'FlowLauncherExporter'
 PLAYNITE_SCHEME = 'playnite://'
 
 EPIC = 'Epic'
@@ -28,16 +30,26 @@ def camel_to_snake(text):
 
 class PlayniteApp:
 
-    def __init__(self, path: Path | str = PLAYNITE_DIR):
-        self.path = Path(path)
+    def __init__(self, path: Path | str = DEFAULT_PLAYNITE_DIR):
+        self._path = Path(os.path.expandvars(path))
+
+    @property
+    def path(self):
+        if self._path.is_dir():
+            return self._path
+        elif str(self._path).endswith(LIBRARY_FILE):
+            return self._path.parent.parent.parent
+
+    @property
+    def library_path(self):
+        return self.path.joinpath(EXTENSION_DATA, PLUGIN_NAME, LIBRARY_FILE)
 
     def filter_installed(self, game):
         return game['IsInstalled']
 
-    def get_games(self, filter=None, file_name='library.json'):
-        library_file = Path(PLAYNITE_DIR, 'ExtensionsData', SCRIPT_NAME, file_name)
+    def get_games(self, filter=None):
         games = []
-        with open(library_file, encoding='utf-8-sig') as f:
+        with open(self.library_path, encoding='utf-8-sig') as f:
             data = json.load(f)
         for game in data:
             games.append(Game(Playnite=self, **game))

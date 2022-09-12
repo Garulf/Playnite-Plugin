@@ -3,9 +3,9 @@ from pathlib import Path
 from difflib import SequenceMatcher as SM
 
 from flox import Flox, ICON_SETTINGS
-from playnite import PLAYNITE_DIR, PlayniteApp
+from playnite import DEFAULT_PLAYNITE_DIR, PlayniteApp
 from result import Result
-from filters import IsInstalled
+from filters import IsInstalled, IsHidden
 
 
 SCORE_CUTOFF = 10
@@ -15,10 +15,13 @@ class Playnite(Flox):
 
     def load_settings(self):
         self.applied_filters = []
-        self.playnite_path = self.settings.setdefault('playnite_path', str(PLAYNITE_DIR))
+        self.playnite_path = self.settings.setdefault('playnite_path', str(DEFAULT_PLAYNITE_DIR))
         self.hide_uninstalled = self.settings.get('hide_uninstalled', True)
         if self.hide_uninstalled:
             self.applied_filters.append(IsInstalled)
+        # If has "Show Hidden" setting, hide hidden games
+        if not self.settings.get('show_hidden', False):
+            self.applied_filters.append(IsHidden(invert=True))
         self.pn = PlayniteApp(self.playnite_path)
 
     def query(self, query):
