@@ -1,68 +1,67 @@
+from __future__ import annotations
+
 import json
 from pathlib import Path
 import os
-import webbrowser
+from dataclasses import dataclass, field
+from typing import List
+from filters import LibraryFilter, filter_game, IsID
+from game import Game, ID
+from exceptions import PlayniteNotFound, LibraryNotFound
 
 
+PLAYNITE_DIR_NAME = 'Playnite'
 SCRIPT_NAME = 'FlowLauncherExporter'
-DATA_FOLDER = Path(os.getenv('APPDATA'), 'Playnite')
-PLUGIN_NAME = 'FlowLauncher_Exporter'
+DEFAULT_PLAYNITE_DIR = Path(os.getenv('APPDATA'), PLAYNITE_DIR_NAME)
+EXTENSION_DATA = 'ExtensionsData'
+LIBRARY_FILE = 'library.json'
+PLUGIN_NAME = 'FlowLauncherExporter'
 
+EPIC = 'Epic'
+STEAM = 'Steam'
+SOURCES = [EPIC, STEAM]
 
-def import_games(data_folder=DATA_FOLDER, file_name='library.json'):
-    library_file = Path(data_folder, 'ExtensionsData', SCRIPT_NAME, file_name)
-    games = []
-    with open(library_file, encoding='utf-8-sig') as f:
-        data = json.load(f)
+class PlayniteApp:
+
+    def __init__(self, path: Path | str = DEFAULT_PLAYNITE_DIR):
+        self._path = Path(os.path.expandvars(path))
+
+    @property
+    def path(self) -> Path:
+        if not self._path.exists():
+            raise PlayniteNotFound(self._path)
+        if self._path.is_dir():
+            return self._path
+        elif str(self._path).endswith(LIBRARY_FILE):
+            return self._path.parent.parent.parent
+
+    @property
+    def library_path(self) -> Path:
+        path = self.path.joinpath(EXTENSION_DATA, PLUGIN_NAME, LIBRARY_FILE)
+        if not path.exists():
+            raise LibraryNotFound(path)
+        return path
+
+    def get_games(self, filter=None) -> List[Game]:
+        games = []
+        with open(self.library_path, encoding='utf-8-sig') as f:
+            data = json.load(f)
         for game in data:
-            # print(game)
-            games.append(Game(data_folder, game))
-    return games
+            games.append(Game(Playnite=self, **game))
+        return games
 
-def camel_to_snake(text):
-    return ''.join(['_'+char.lower() if char.isupper() else char for char in text]).lstrip('_')
+    def search(self, query: str, filters: list[LibraryFilter] = []) -> List[Game]:
+        """Searches the Playnite library for games matching the query."""
+        games = self.get_games()
+        return [game for game in games if (query.lower() in game.Name.lower() or query.lower() == self._acronym(game.Name.lower())) and filter_game(filters, game, query)]
 
-class Game(object):
+    def game(self, id: ID) -> Game | None:
+        """Returns a Game object by ID from the Playnite library."""
+        filter = IsID(id)
+        try:
+            return self.search('', [filter])[0]
+        except IndexError:
+            return None
 
-    def __init__(self, data_folder, data) -> None:
-        self.data_folder = data_folder
-        self.data = data
-        self.hidden = False
-        for key, value in data.items():
-            if value == 'True':
-                value = True
-            elif value == 'False':
-                value = False
-            setattr(self, camel_to_snake(key).lower(), value)
-        if self.source is None:
-            self.source = {
-                'Name': 'Unknown',
-            }
-
-    @property
-    def start_uri(self):
-        return f'playnite://playnite/start/{self.id}'
-
-    @property
-    def show_uri(self):
-        return f'playnite://playnite/showgame/{self.id}'
-
-    @property
-    def icon_path(self):
-        if self.icon:
-            path = Path(self.data_folder, 'library', 'files', self.icon)
-            if path.is_file():
-                return path
-        return ''
-
-    def start(self):
-        webbrowser.open(self.uri)
-
-    def show_game(self):
-        webbrowser.open(self.show_uri)
-
-
-if __name__ == "__main__":
-    games = import_games()
-    for game in games:
-        print(game.icon_path)
+    def _acronym(self, text):
+        return ''.join([word[0] for word in text.split()])

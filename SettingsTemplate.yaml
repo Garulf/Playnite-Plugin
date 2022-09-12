@@ -7,16 +7,34 @@ body:
   - type: input
     attributes:
       name: playnite_path
-      label: 'Playnite User Directory:'
-      description: Location of Playnite user folder 
+      label: 'Playnite Directory:'
+      description: Location of Playnite folder or database file.
+      defaultValue: "%appdata%\\Playnite"
+  - type: textBlock
+    attributes:
+      name: description
+      description: >
+        Path should be either your Playnite install directory or the database file path.
+        Examples: 
+  - type: textBlock
+    attributes:
+      name: description
+      description: >
+        C:\Users\%USERNAME%\AppData\Roaming\Playnite
+  - type: textBlock
+    attributes:
+      name: description
+      description: >
+        %APPDATA%\Playnite\ExtensionsData\FlowLauncher_Exporter\library.json
   - type: checkbox
     attributes:
       name: hide_uninstalled
       label: 'Hide Uninstalled:'
       defaultValue: "true"
       description: Hides uninstalled from default results
-  - type: textBlock
+  - type: checkbox
     attributes:
-      name: description
-      description: >
-        Hide Games that are currently not installed from defautl results. You can unhide them temporarily by using the "@" keyword.
+      name: show_hidden
+      label: 'Show Hidden:'
+      defaultValue: "false"
+      description: Show hidden games in default results
