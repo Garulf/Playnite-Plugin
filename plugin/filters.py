@@ -1,4 +1,4 @@
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, List
 
 if TYPE_CHECKING:
     from playnite import Game
@@ -48,7 +48,7 @@ FILTERS = {
     SOURCE_FILTER: IsSource,
 }
 
-def filter_game(filters: list[LibraryFilter], game: "Game", query: str = None) -> bool:
+def filter_game(filters: List[LibraryFilter], game: "Game", query: str = None) -> bool:
     for filter in filters:
         if not isinstance(filter, LibraryFilter):
             filter = filter()
