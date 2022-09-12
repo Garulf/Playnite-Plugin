@@ -6,7 +6,7 @@ import os
 import webbrowser
 from datetime import datetime, timedelta
 from dataclasses import dataclass, field
-from typing import TypedDict
+from typing import TypedDict, List
 from filters import LibraryFilter, filter_game, IsHidden, IsInstalled, IsSource
 
 
@@ -28,17 +28,17 @@ class PlayniteApp:
         self._path = Path(os.path.expandvars(path))
 
     @property
-    def path(self):
+    def path(self) -> Path:
         if self._path.is_dir():
             return self._path
         elif str(self._path).endswith(LIBRARY_FILE):
             return self._path.parent.parent.parent
 
     @property
-    def library_path(self):
+    def library_path(self) -> Path:
         return self.path.joinpath(EXTENSION_DATA, PLUGIN_NAME, LIBRARY_FILE)
 
-    def get_games(self, filter=None):
+    def get_games(self, filter=None) -> List[Game]:
         games = []
         with open(self.library_path, encoding='utf-8-sig') as f:
             data = json.load(f)
@@ -46,11 +46,13 @@ class PlayniteApp:
             games.append(Game(Playnite=self, **game))
         return games
 
-    def search(self, query: str, filters: list[LibraryFilter] = []):
+    def search(self, query: str, filters: list[LibraryFilter] = []) -> List[Game]:
+        """Searches the Playnite library for games matching the query."""
         games = self.get_games()
         return [game for game in games if (query.lower() in game.Name.lower() or query.lower() == self._acronym(game.Name.lower())) and filter_game(filters, game, query)]
 
-    def game(self, id: str):
+    def game(self, id: str) -> Game | None:
+        """Returns a Game object by ID from the Playnite library."""
         games = self.get_games()
         for game in games:
             if game.Id == id:
@@ -87,33 +89,33 @@ class Game:
     Playnite: Playnite = field(repr=False)
 
 
-    def _build_uri(self, action, scheme=PLAYNITE_SCHEME):
+    def _build_uri(self, action, scheme=PLAYNITE_SCHEME) -> str:
         return f"{scheme}playnite/{action}/{self.Id}"
 
-    def get_release_date(self):
+    def get_release_date(self) -> datetime | None:
         if self.ReleaseDate:
             return datetime(self.ReleaseDate.Year, self.ReleaseDate.Month, self.ReleaseDate.Day)
         return None
 
     @property
-    def start_uri(self):
+    def start_uri(self) -> str:
         return self._build_uri('start')
 
     @property
-    def show_game_uri(self):
+    def show_game_uri(self) -> str:
         return self._build_uri('showgame')
 
     @property
-    def icon_path(self):
+    def icon_path(self) -> Path | None:
         if self.Icon:
             path = Path(self.Playnite.path, 'library', 'files', self.Icon)
             if path.is_file():
                 return path
-        return ''
+        return None
 
-    def start(self):
+    def start(self) -> None:
         webbrowser.open(self.start_uri)
 
-    def show_game(self):
+    def show_game(self) -> None:
         webbrowser.open(self.show_game_uri)
 
