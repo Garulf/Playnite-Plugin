@@ -117,9 +117,3 @@ class Game:
     def show_game(self):
         webbrowser.open(self.show_game_uri)
 
-
-if __name__ == "__main__":
-    pn = PlayniteApp()
-    games = pn.search(None, [IsSource('Epic')])
-    print(games)
-    print(len(games))
