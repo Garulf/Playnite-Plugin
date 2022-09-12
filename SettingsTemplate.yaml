@@ -13,7 +13,7 @@ body:
     attributes:
       name: description
       description: >
-        Path should be either your Playnite install directory or the database file. 
+        Path should be either your Playnite install directory or the database file. If blank, the plugin will search for the database file in the default location.
         Example: `C:\Users\%USERNAME%\AppData\Roaming\Playnite` or `%APPDATA%\Playnite\ExtensionsData\FlowLauncherExporter`.
   - type: checkbox
     attributes:
