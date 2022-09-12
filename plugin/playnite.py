@@ -38,9 +38,6 @@ class PlayniteApp:
     def library_path(self):
         return self.path.joinpath(EXTENSION_DATA, PLUGIN_NAME, LIBRARY_FILE)
 
-    def filter_installed(self, game):
-        return game['IsInstalled']
-
     def get_games(self, filter=None):
         games = []
         with open(self.library_path, encoding='utf-8-sig') as f:
