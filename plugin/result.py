@@ -40,3 +40,47 @@ class Result:
             'parameters': self.parameters,
             'context': self.context,
         }
+
+class OpenInPlaynite(Result):
+
+    @property
+    def title(self):
+        return f'Open in Playnite'
+
+    @property
+    def subtitle(self):
+        return "Opens the selected game in Playnite"
+
+    @property
+    def icon(self):
+        return None
+
+    @property
+    def method(self):
+        return 'open'
+
+    @property
+    def parameters(self):
+        return [self.game.show_game_uri]
+
+class LaunchGameContext(Result):
+    
+        @property
+        def title(self):
+            return f'Launch Game'
+    
+        @property
+        def subtitle(self):
+            return "Launches the selected game"
+    
+        @property
+        def icon(self):
+            return None
+    
+        @property
+        def method(self):
+            return 'start'
+    
+        @property
+        def parameters(self):
+            return [self.game.start_uri]

@@ -40,6 +40,7 @@ class PlayniteApp:
         path = self.path.joinpath(EXTENSION_DATA, PLUGIN_NAME, LIBRARY_FILE)
         if not path.exists():
             raise LibraryNotFound(path)
+        return path
 
     def get_games(self, filter=None) -> List[Game]:
         games = []

@@ -3,7 +3,7 @@ from pathlib import Path
 
 from flox import Flox
 from playnite import DEFAULT_PLAYNITE_DIR, PlayniteApp
-from result import Result
+from result import Result, OpenInPlaynite, LaunchGameContext
 from filters import IsInstalled, IsHidden
 from exceptions import PlayniteNotFound, LibraryNotFound
 
@@ -45,16 +45,11 @@ class Playnite(Flox):
             )
 
     def context_menu(self, data):
-        show_uri = data[0]
-        icon = str(self.icon if Path(self.icon).is_absolute() else Path(self.plugindir, self.icon))
-        self.logger.warning(icon)
-        self.add_item(
-            title='Open in Playnite',
-            subtitle='Shows Game in Playnite library.',
-            icon=icon,
-            method=self.uri,
-            parameters=[show_uri],
-        )
+        self.load_settings()
+        game = self.pn.game(data)
+        if game:
+            self.add_item(**OpenInPlaynite(game).to_dict())
+            self.add_item(**LaunchGameContext(game).to_dict())
 
     def uri(self, uri):
         webbrowser.open(uri)
