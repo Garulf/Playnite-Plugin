@@ -37,6 +37,15 @@ class IsSource(LibraryFilter):
             return game.Source["Name"].lower() == self.source.lower()
         return False
 
+class IsID(LibraryFilter):
+
+    def __init__(self, id: str, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.id = id
+
+    def filter(self, game: 'Game') -> bool:
+        return game.Id == self.id
+
 def filter_game(filters: List[LibraryFilter], game: "Game", query: str = None) -> bool:
     for filter in filters:
         if not isinstance(filter, LibraryFilter):
