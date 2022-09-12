@@ -9,6 +9,7 @@ body:
       name: playnite_path
       label: 'Playnite Directory:'
       description: Location of Playnite folder or database file.
+      defaultValue: "%appdata%\\Playnite"
   - type: textBlock
     attributes:
       name: description
