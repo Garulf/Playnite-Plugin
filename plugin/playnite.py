@@ -7,6 +7,7 @@ from dataclasses import dataclass, field
 from typing import List
 from filters import LibraryFilter, filter_game, IsID
 from game import Game, ID
+from exceptions import PlayniteNotFound, LibraryNotFound
 
 
 PLAYNITE_DIR_NAME = 'Playnite'
@@ -27,6 +28,8 @@ class PlayniteApp:
 
     @property
     def path(self) -> Path:
+        if not self._path.exists():
+            raise PlayniteNotFound(self._path)
         if self._path.is_dir():
             return self._path
         elif str(self._path).endswith(LIBRARY_FILE):
@@ -34,7 +37,9 @@ class PlayniteApp:
 
     @property
     def library_path(self) -> Path:
-        return self.path.joinpath(EXTENSION_DATA, PLUGIN_NAME, LIBRARY_FILE)
+        path = self.path.joinpath(EXTENSION_DATA, PLUGIN_NAME, LIBRARY_FILE)
+        if not path.exists():
+            raise LibraryNotFound(path)
 
     def get_games(self, filter=None) -> List[Game]:
         games = []
