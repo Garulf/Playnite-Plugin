@@ -24,19 +24,6 @@ Copy and paste this into your browser to automatically start installation.
 
 Simply type the default keyword: `pn` and search your Playnite library.
 
-### Filter by Source:
-
-Type: `#` to filter by a specific Source
-
-![Screenshot 2022-01-11 103736](https://user-images.githubusercontent.com/535299/148973352-27c22827-4a19-4975-83e6-24bc814103ca.png)
-
-
-### Filter by install status:
-
-Type: `@` to show all games including uninstalled games.
-
-![Screenshot 2022-01-11 103608](https://user-images.githubusercontent.com/535299/148973214-aecfd4b9-20a5-4d55-a998-b6e972673187.png)
-
 
 ## Screenshots:
 <details>
