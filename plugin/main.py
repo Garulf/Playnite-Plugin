@@ -7,8 +7,6 @@ from playnite import DEFAULT_PLAYNITE_DIR, PlayniteApp
 from result import Result
 from filters import IsInstalled, IsHidden
 
-
-SCORE_CUTOFF = 10
 PLUGIN_URI = 'playnite://playnite/installaddon/FlowLauncherExporter'
 
 class Playnite(Flox):
