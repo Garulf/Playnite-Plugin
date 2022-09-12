@@ -3,11 +3,6 @@ from typing import TYPE_CHECKING, List
 if TYPE_CHECKING:
     from playnite import Game
 
-HIDDEN_FILTER = 'hidden'
-INSTALLED_FILTER = 'installed'
-SOURCE_FILTER = 'source'
-
-
 class LibraryFilter:
 
     def __init__(self, invert: bool = False):
@@ -41,12 +36,6 @@ class IsSource(LibraryFilter):
         if game.Source is not None:
             return game.Source["Name"].lower() == self.source.lower()
         return False
-
-FILTERS = {
-    HIDDEN_FILTER: IsHidden,
-    INSTALLED_FILTER: IsInstalled,
-    SOURCE_FILTER: IsSource,
-}
 
 def filter_game(filters: List[LibraryFilter], game: "Game", query: str = None) -> bool:
     for filter in filters:
