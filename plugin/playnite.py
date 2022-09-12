@@ -7,7 +7,7 @@ import webbrowser
 from datetime import datetime, timedelta
 from dataclasses import dataclass, field
 from typing import TypedDict, List
-from filters import LibraryFilter, filter_game, IsHidden, IsInstalled, IsSource
+from filters import LibraryFilter, filter_game, IsID
 
 
 PLAYNITE_DIR_NAME = 'Playnite'
@@ -53,12 +53,11 @@ class PlayniteApp:
 
     def game(self, id: str) -> Game | None:
         """Returns a Game object by ID from the Playnite library."""
-        games = self.get_games()
-        for game in games:
-            if game.Id == id:
-                return game
-        return None
-        
+        filter = IsID(id)
+        try:
+            return self.search('', [filter])[0]
+        except IndexError:
+            return None
 
     def _acronym(self, text):
         return ''.join([word[0] for word in text.split()])
