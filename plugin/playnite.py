@@ -22,12 +22,6 @@ EPIC = 'Epic'
 STEAM = 'Steam'
 SOURCES = [EPIC, STEAM]
 
-
-def camel_to_snake(text):
-    return ''.join(['_'+char.lower() if char.isupper() else char for char in text]).lstrip('_')
-
-
-
 class PlayniteApp:
 
     def __init__(self, path: Path | str = DEFAULT_PLAYNITE_DIR):
