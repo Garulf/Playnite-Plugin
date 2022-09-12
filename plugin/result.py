@@ -21,7 +21,7 @@ class Result:
 
     @property
     def method(self):
-        return 'start'
+        return 'uri'
 
     @property
     def parameters(self):
@@ -57,7 +57,7 @@ class OpenInPlaynite(Result):
 
     @property
     def method(self):
-        return 'open'
+        return 'uri'
 
     @property
     def parameters(self):
@@ -79,7 +79,7 @@ class LaunchGameContext(Result):
     
         @property
         def method(self):
-            return 'start'
+            return 'uri'
     
         @property
         def parameters(self):
