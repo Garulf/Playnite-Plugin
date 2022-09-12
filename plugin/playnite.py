@@ -59,12 +59,13 @@ class PlayniteApp:
         games = self.get_games()
         return [game for game in games if (query.lower() in game.Name.lower() or query.lower() == self._acronym(game.Name.lower())) and filter_game(filters, game, query)]
 
-    def game_id(self, game_id: str):
+    def game(self, id: str):
         games = self.get_games()
         for game in games:
-            if game.Id == game_id:
+            if game.Id == id:
                 return game
         return None
+        
 
     def _acronym(self, text):
         return ''.join([word[0] for word in text.split()])
