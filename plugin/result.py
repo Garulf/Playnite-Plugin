@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from playnite import Game
+from .playnite import Game
 
 class Result:
 

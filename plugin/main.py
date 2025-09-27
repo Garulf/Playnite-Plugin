@@ -2,10 +2,10 @@ import webbrowser
 from pathlib import Path
 
 from flox import Flox
-from playnite import DEFAULT_PLAYNITE_DIR, PlayniteApp
-from result import Result, OpenInPlaynite, LaunchGameContext
-from filters import IsInstalled, IsHidden
-from exceptions import PlayniteNotFound, LibraryNotFound
+from .playnite import DEFAULT_PLAYNITE_DIR, PlayniteApp
+from .result import Result, OpenInPlaynite, LaunchGameContext
+from .filters import IsInstalled, IsHidden
+from .exceptions import PlayniteNotFound, LibraryNotFound
 
 PLUGIN_URI = 'playnite://playnite/installaddon/FlowLauncherExporter'
 

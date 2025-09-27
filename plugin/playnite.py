@@ -5,9 +5,9 @@ from pathlib import Path
 import os
 from dataclasses import dataclass, field
 from typing import List
-from filters import LibraryFilter, filter_game, IsID
-from game import Game, ID
-from exceptions import PlayniteNotFound, LibraryNotFound
+from .filters import LibraryFilter, filter_game, IsID
+from .game import Game, ID
+from .exceptions import PlayniteNotFound, LibraryNotFound
 
 
 PLAYNITE_DIR_NAME = 'Playnite'
