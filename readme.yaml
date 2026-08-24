@@ -1,0 +1,13 @@
+template: docs/README.md.j2
+project:
+  name: Playnite
+  owner: Garulf
+  repo: Playnite-Plugin
+  license: MIT
+  tagline: Search and launch your Playnite library. Fully local, no Playnite extension required.
+  ci_workflow: tests.yml
+badges: [ci, github-release, license]
+donate: [buymeacoffee, github-sponsors]
+donate_handles:
+  buymeacoffee: garulf
+  github-sponsors: Garulf

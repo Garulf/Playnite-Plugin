@@ -1,0 +1,48 @@
+{% extends "base.md.j2" %}
+
+{% block usage %}
+## Features
+
+* **No Playnite extension required.** Reads `games.db` directly with litedb-py.
+* **Fully local.** No web requests, no API keys.
+* **Fuzzy matching.** `pn rdr2` will match Red Dead Redemption 2.
+* **Icons and cover art.** Game icons in results, cover art on `F1`.
+* **All your sources.** Every library Playnite knows about, in one search.
+* **Launch or open.** Installed games launch directly; uninstalled games open their Playnite page.
+* **Rich context menu.** Open install folder, jump to store links, copy the game id.
+* **Hidden games, opt-in.** Include games hidden in Playnite via a setting.
+
+## Usage
+
+Type `pn` followed by a game name:
+
+```
+pn doom
+```
+
+## Installation
+
+### Flow Launcher
+
+In Flow Launcher, type:
+
+```
+pm install playnite
+```
+
+### Manual installation
+
+Download `Playnite-Plugin.zip` from the [latest release]({{ project.url }}/releases/latest) and unzip it into
+`%appdata%\FlowLauncher\Plugins`, then restart Flow Launcher.
+
+## Changelog
+
+{{ changelog(3) }}
+
+See [CHANGELOG.md](CHANGELOG.md) for the full history.
+{% endblock %}
+
+{% block screenshots %}{% endblock %}
+{% block install %}{% endblock %}
+{% block contributing %}{% endblock %}
+{% block license %}{% endblock %}
