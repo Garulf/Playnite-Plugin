@@ -1206,7 +1206,7 @@ config = {
     "max_results": len(results),
     "selection": 0,
     "results": results,
-    "css": None,
+    "css": "win11-dark.css",
     "query_suggestion": "",
 }
 Path(".github/assets").mkdir(parents=True, exist_ok=True)
@@ -1226,12 +1226,12 @@ mv .github/assets/output_*.png .github/assets/screenshot.png
 
 # plugin-manager "pm install" view; stage the shipped layout so -p sees a real plugin dir:
 stage=$(mktemp -d) && cp -r src/. "$stage/" && cp data/plugin.json data/SettingsTemplate.yaml data/icon.png "$stage/"
-flow-render -i -p "$stage" -o .github/assets --hide-caret
+flow-render -i -p "$stage" -s win11-dark -o .github/assets --hide-caret
 mv .github/assets/output_*.png .github/assets/install.png
 rm -rf "$stage"
 ```
 
-View both PNGs (send them to the user) and confirm: correct icons, subtitles matching `game_subtitle` output, no rendering glitches.
+View both PNGs (send them to the user) and confirm: win11-dark theme applied to both, correct icons, subtitles matching `game_subtitle` output, no rendering glitches.
 
 - [ ] **Step 5: Wire into the README and re-render**
 
