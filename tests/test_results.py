@@ -42,9 +42,15 @@ def test_preview_uses_cover_when_present(tmp_path):
 
 
 def test_full_context_menu(tmp_path):
-    payload = context_payload(game(), tmp_path)
+    payload = context_payload(game(install_directory=str(tmp_path)), tmp_path)
     titles = menu_titles(payload)
     assert titles == ["Launch", "Show in Playnite", "Open install folder", "Steam", "Copy game Id"]
+
+
+def test_context_menu_omits_missing_install_directory(tmp_path):
+    missing = tmp_path / "gone"
+    payload = context_payload(game(install_directory=str(missing)), tmp_path)
+    assert "Open install folder" not in menu_titles(payload)
 
 
 def test_context_menu_is_conditional(tmp_path):
@@ -54,9 +60,9 @@ def test_context_menu_is_conditional(tmp_path):
 
 
 def test_context_menu_actions(tmp_path):
-    payload = context_payload(game(), tmp_path)
+    payload = context_payload(game(install_directory=str(tmp_path)), tmp_path)
     menu = {result.title: result.json_rpc_action for result in build_context_menu(payload)}
-    assert menu["Open install folder"]["Parameters"][0] == r"F:\Games\Doom"
+    assert menu["Open install folder"]["Parameters"][0] == str(tmp_path)
     assert menu["Steam"]["Parameters"][0] == "https://store.steampowered.com/app/2280"
     assert menu["Copy game Id"]["Parameters"][0] == "033b6530-47a6-4179-a8fa-c1197ea4f335"
 

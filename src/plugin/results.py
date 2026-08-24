@@ -59,7 +59,7 @@ def build_context_menu(payload: dict) -> list[Result]:
             json_rpc_action=api.open_uri(show_game_uri(game_id)),
         ),
     ]
-    if installed and payload.get("install_directory"):
+    if installed and payload.get("install_directory") and Path(payload["install_directory"]).is_dir():
         results.append(
             Result(
                 title="Open install folder",
