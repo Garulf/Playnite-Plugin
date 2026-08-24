@@ -1,59 +1,80 @@
-name: "Release-Builder"
+name: Release
+
 on:
   workflow_dispatch:
   push:
-    branches: [ main ]
-    tags-ignore:
-      - 'v*'
-    paths-ignore: 
-      - .github/workflows/*
-      - README.md
-      - assets/*
+    tags:
+      - "v*"
+
+permissions:
+  contents: write
+
 env:
-  PYTHON_VER: 3.8
+  PYTHON_VER: "3.12"
+
 jobs:
-  deps:
-    if: ${{ github.ref == 'refs/heads/main' }}
-    name: "Build"
-    runs-on: windows-latest
+  package-and-release:
+    name: Package and Release
+    runs-on: ubuntu-latest
+
     steps:
       - name: Checkout
-        uses: actions/checkout@v2
+        uses: actions/checkout@v4
         with:
           fetch-depth: 0
-      - name: Set up Python ${{ env.PYTHON_VER }}
-        uses: actions/setup-python@v2
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
         with:
           python-version: ${{ env.PYTHON_VER }}
-      - uses: actions/cache@v2
-        if: startsWith(runner.os, 'Windows')
-        with:
-          path: ~\AppData\Local\pip\Cache
-          key: ${{ runner.os }}-pip-${{ hashFiles('**/requirements.txt') }}
-          restore-keys: |
-            ${{ runner.os }}-pip-
-      - name: Install dependencies
+
+      - name: Stage build files
+        id: stage
+        shell: bash
+        run: |
+          build_dir="$RUNNER_TEMP/build"
+          mkdir -p "$build_dir"
+
+          cp -r src/. "$build_dir/"
+          cp data/icon.png "$build_dir/"
+          cp data/plugin.json "$build_dir/"
+          cp data/SettingsTemplate.yaml "$build_dir/"
+          cp LICENSE "$build_dir/"
+
+          site_dir="$build_dir/plugin/site-packages"
+          mkdir -p "$site_dir"
+
+          echo "build_dir=$build_dir" >> "$GITHUB_OUTPUT"
+          echo "site_dir=$site_dir" >> "$GITHUB_OUTPUT"
+
+      - name: Install requirements into build/lib
+        shell: bash
         run: |
           python -m pip install --upgrade pip
-          pip install wheel
-          pip install -r ./requirements.txt -t ./lib
-      - name: Get Plugin's version
-        id: version
-        uses: notiz-dev/github-action-json-property@release
-        with: 
-          path: 'plugin.json'
-          prop_path: 'Version'
-      - name: Package files
+          python -m pip install -r requirements.txt --target "${{ steps.stage.outputs.site_dir }}"
+
+      - name: Create release archive
+        id: archive
+        shell: bash
         run: |
-          git clone https://github.com/Garulf/flow_commands/ bin
-          pip install -r ./bin/requirements.txt
-          python ./bin/commands.py package -n "${{github.event.repository.name}}.zip"
-      - name: Publish
-        uses: softprops/action-gh-release@v1
+          repo_name="${{ github.event.repository.name }}"
+          version="${{ github.ref_name }}"
+          version="${version#v}"
+          zip_name="${repo_name}-${version}.zip"
+          zip_path="$RUNNER_TEMP/$zip_name"
+
+          (
+            cd "${{ steps.stage.outputs.build_dir }}"
+            zip -r "$zip_path" .
+          )
+
+          echo "zip_path=$zip_path" >> "$GITHUB_OUTPUT"
+
+      - name: Release zip
+        uses: softprops/action-gh-release@v2
         with:
-          draft: false
-          files: "./${{github.event.repository.name}}.zip"
-          tag_name: "v${{steps.version.outputs.prop}}"
+          files: ${{ steps.archive.outputs.zip_path }}
+          tag_name: ${{ github.ref_name }}
           generate_release_notes: true
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
