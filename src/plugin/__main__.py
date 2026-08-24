@@ -26,6 +26,9 @@ async def query(query: str):
     except LiteDbError as error:
         yield error_result("Could not read the Playnite library", str(error))
         return
+    except OSError as error:
+        yield error_result("Could not read the Playnite library", str(error))
+        return
     for game in games:
         score = 0
         if query:
