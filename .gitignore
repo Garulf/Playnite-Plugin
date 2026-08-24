@@ -120,3 +120,6 @@ flox
 
 .vscode/
 bin/
+
+# Generated assets
+.github/assets/screenshot-config.json
