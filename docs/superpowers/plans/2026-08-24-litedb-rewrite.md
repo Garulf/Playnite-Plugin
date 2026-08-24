@@ -1131,7 +1131,133 @@ git commit -m "docs: generate README with readwright"
 
 ---
 
-### Task 9: Final verification
+### Task 9: README screenshots with flow-render (curated, real Playnite icons)
+
+**Files:**
+- Create: `.github/assets/screenshot-config.json` (curated flow-render config), `.github/assets/screenshot.png`, `.github/assets/install.png`
+- Modify: `readme.yaml`, `docs/README.md.j2` (reference the new assets), `README.md` (re-render)
+
+**Interfaces:**
+- Consumes: [flow-render](https://github.com/Garulf/flow-render) CLI; the real library copy at `~/projects/games.db` for honest names/playtimes; Task 2's `game_subtitle` formatting rules (subtitles in the mockup must match what the plugin actually renders: `Source · Installed · Nh played · last played YYYY-MM-DD`); Task 8's readwright setup.
+- Produces: README imagery. Config schema (verified against `example/config.json` in the repo): `{"keyword", "query", "icon" (data URI), "max_results", "selection", "results": [{"title", "subtitle", "icon" (data URI)}], "css", "query_suggestion"}`.
+
+- [ ] **Step 1: Install flow-render**
+
+```bash
+uv tool install git+https://github.com/Garulf/flow-render
+playwright install chromium
+```
+
+If Chromium fails to launch at render time with missing shared libraries, run `sudo playwright install-deps chromium` (passwordless sudo apt works in this container) and retry.
+
+- [ ] **Step 2: Pick showcase games and PAUSE for icon files**
+
+Run this to list candidates and their exact icon paths on the Windows machine:
+
+```bash
+cd ~/projects/litedb-py && uv run python - <<'EOF'
+from litedb_py import LiteDatabase
+with LiteDatabase("/home/Garulf/projects/games.db") as db:
+    for doc in db["Game"]:
+        if doc.get("IsInstalled") and doc.get("Icon"):
+            print(f'{doc["Name"]}  |  %AppData%\\Playnite\\library\\files\\{doc["Icon"]}')
+EOF
+```
+
+Choose 3 well-known games with good playtime values. Then STOP and ask the user to copy those 3 icon files (plus, optionally, the Playnite app icon for the search bar — the repo's `data/icon.png` works as the fallback) from their Windows machine into `~/projects/playnite-media/`, preserving nothing but the filenames. Do not proceed until the files exist.
+
+- [ ] **Step 3: Build the curated config**
+
+Generate `.github/assets/screenshot-config.json` with a script so the base64 embedding and subtitles are derived, not hand-typed. Subtitles MUST be computed with the plugin's own `game_subtitle()` from real `games.db` documents so the mockup matches genuine output:
+
+```bash
+cd ~/projects/Playnite-Plugin && uv run python - <<'EOF'
+import base64, json, sys
+from pathlib import Path
+
+sys.path.insert(0, "src/plugin")
+from litedb_py import LiteDatabase
+from playnite import Game, game_subtitle
+
+CHOSEN = {  # game name -> copied icon file (adjust to Step 2's picks)
+    "Grand Theft Auto V Enhanced": "9cca7a5a-icon.ico",
+}
+MEDIA = Path.home() / "projects" / "playnite-media"
+
+def data_uri(path: Path) -> str:
+    mime = "image/x-icon" if path.suffix == ".ico" else "image/png"
+    return f"data:{mime};base64,{base64.b64encode(path.read_bytes()).decode()}"
+
+results = []
+with LiteDatabase(Path.home() / "projects" / "games.db") as db:
+    for doc in db["Game"]:
+        if doc.get("Name") in CHOSEN:
+            game = Game.from_doc(doc, {})
+            results.append({
+                "title": game.name,
+                "subtitle": game_subtitle(game),
+                "icon": data_uri(MEDIA / CHOSEN[game.name]),
+            })
+
+config = {
+    "keyword": "pn",
+    "query": next(iter(CHOSEN)).split()[0].lower(),
+    "icon": data_uri(Path("data/icon.png")),
+    "max_results": len(results),
+    "selection": 0,
+    "results": results,
+    "css": None,
+    "query_suggestion": "",
+}
+Path(".github/assets").mkdir(parents=True, exist_ok=True)
+Path(".github/assets/screenshot-config.json").write_text(json.dumps(config, indent=2))
+print("wrote", len(results), "results")
+EOF
+```
+
+Fill `CHOSEN` with the 3 picks from Step 2 and set `query` to a natural partial query that matches the selected (top) game.
+
+- [ ] **Step 4: Render the results screenshot and the install view**
+
+```bash
+flow-render -c .github/assets/screenshot-config.json -o .github/assets --hide-caret
+# rename the freshly produced output_<timestamp>_<id>.png:
+mv .github/assets/output_*.png .github/assets/screenshot.png
+
+# plugin-manager "pm install" view; stage the shipped layout so -p sees a real plugin dir:
+stage=$(mktemp -d) && cp -r src/. "$stage/" && cp data/plugin.json data/SettingsTemplate.yaml data/icon.png "$stage/"
+flow-render -i -p "$stage" -o .github/assets --hide-caret
+mv .github/assets/output_*.png .github/assets/install.png
+rm -rf "$stage"
+```
+
+View both PNGs (send them to the user) and confirm: correct icons, subtitles matching `game_subtitle` output, no rendering glitches.
+
+- [ ] **Step 5: Wire into the README and re-render**
+
+Add to `readme.yaml`:
+
+```yaml
+screenshots:
+  dir: .github/assets
+```
+
+Reference `screenshot.png` in the Usage section and `install.png` in the Installation section of `docs/README.md.j2` (same placement as Steam-Search's README), then:
+
+```bash
+uvx --from ~/projects/readwright readwright render
+```
+
+- [ ] **Step 6: Commit**
+
+```bash
+git add .github/assets readme.yaml docs/README.md.j2 README.md
+git commit -m "docs: add flow-render screenshots to README"
+```
+
+---
+
+### Task 10: Final verification
 
 **Files:** none new.
 
