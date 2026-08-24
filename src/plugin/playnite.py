@@ -1,5 +1,8 @@
 from __future__ import annotations
 
+import os
+import shutil
+import tempfile
 from dataclasses import dataclass, field
 from datetime import datetime
 from pathlib import Path
@@ -83,3 +86,52 @@ def game_subtitle(game: Game) -> str:
     if game.last_activity:
         parts.append(f"last played {game.last_activity.date().isoformat()}")
     return " · ".join(part for part in parts if part)
+
+
+DEFAULT_DATA_DIR = r"%APPDATA%\Playnite"
+CACHE_DIR_NAME = "flow-playnite-plugin"
+
+
+class PlayniteNotFound(Exception):
+    def __init__(self, path: Path):
+        self.path = path
+        super().__init__(f"Playnite data directory not found: {path}")
+
+
+class LibraryNotFound(Exception):
+    def __init__(self, path: Path):
+        self.path = path
+        super().__init__(f"Playnite library database not found: {path}")
+
+
+class PlayniteLibrary:
+    def __init__(self, data_dir: "str | os.PathLike" = DEFAULT_DATA_DIR, cache_dir: "str | os.PathLike | None" = None):
+        self.data_dir = Path(os.path.expandvars(str(data_dir)))
+        self.cache_dir = Path(cache_dir) if cache_dir else Path(tempfile.gettempdir(), CACHE_DIR_NAME)
+
+    @property
+    def library_dir(self) -> Path:
+        if not self.data_dir.is_dir():
+            raise PlayniteNotFound(self.data_dir)
+        return self.data_dir / "library"
+
+    @property
+    def games_db(self) -> Path:
+        path = self.library_dir / "games.db"
+        if not path.is_file():
+            raise LibraryNotFound(path)
+        return path
+
+    @property
+    def files_dir(self) -> Path:
+        return self.library_dir / "files"
+
+    def cached_copy(self, source: Path) -> Path:
+        stat = source.stat()
+        cached = self.cache_dir / f"{source.stem}-{stat.st_mtime_ns}-{stat.st_size}.db"
+        if not cached.is_file():
+            self.cache_dir.mkdir(parents=True, exist_ok=True)
+            for stale in self.cache_dir.glob(f"{source.stem}-*.db"):
+                stale.unlink(missing_ok=True)
+            shutil.copy(source, cached)
+        return cached
