@@ -14,7 +14,7 @@
 
 - Plugin identity is fixed, verbatim: ID `625A2812D5364D708582FDD9ACCD8C93`, Name `Playnite`, ActionKeyword `pn`, Version `3.0.0`, Language `python_v2`.
 - Runtime deps pinned exactly: `pyflowlauncher==1.1.0`, `litedb-py==0.1.0`.
-- Runtime target is Windows (Flow Launcher, Python 3.12); the test suite must pass on this Linux container. Never call `os.startfile` or assume `\\` is `os.sep` — DB media paths use backslashes and are split manually.
+- Runtime target is Windows (Flow Launcher, Python 3.12); the test suite must pass on this Linux container. Never call `os.startfile` or assume `\\` is `os.sep` - DB media paths use backslashes and are split manually.
 - Conventional Commits; no em dashes anywhere in commits, code, or docs; no AI attribution of any kind.
 - Work happens on branch `rewrite/litedb` in `~/projects/Playnite-Plugin`.
 - All test commands run from the repo root: `uv run pytest ...`.
@@ -40,7 +40,7 @@ mkdir -p data src/plugin tests
 git mv icon.png data/icon.png
 ```
 
-- [ ] **Step 2: Write the manifest** — `data/plugin.json`:
+- [ ] **Step 2: Write the manifest** - `data/plugin.json`:
 
 ```json
 {
@@ -57,7 +57,7 @@ git mv icon.png data/icon.png
 }
 ```
 
-- [ ] **Step 3: Write the settings template** — `data/SettingsTemplate.yaml`:
+- [ ] **Step 3: Write the settings template** - `data/SettingsTemplate.yaml`:
 
 ```yaml
 body:
@@ -80,10 +80,10 @@ body:
       description: Include games marked hidden in Playnite.
 ```
 
-- [ ] **Step 4: Write the runner shim** — `src/run.py`, verbatim from Steam-Search:
+- [ ] **Step 4: Write the runner shim** - `src/run.py`, verbatim from Steam-Search:
 
 ```python
-# run.py — generic shim, identical across all plugins
+# run.py - generic shim, identical across all plugins
 import runpy
 import sys
 import os
@@ -177,7 +177,7 @@ uv run pytest; echo "exit $?"   # exit 5 (no tests collected) is expected
 pre-commit install --hook-type pre-commit --hook-type pre-push
 ```
 
-Expected: `ok` printed; pytest exits 5; hooks installed. If `litedb-py==0.1.0` fails to resolve from PyPI, stop and report — do not substitute a git dependency silently.
+Expected: `ok` printed; pytest exits 5; hooks installed. If `litedb-py==0.1.0` fails to resolve from PyPI, stop and report - do not substitute a git dependency silently.
 
 - [ ] **Step 8: Commit**
 
@@ -202,7 +202,7 @@ git commit -m "feat!: scaffold python_v2 plugin layout, drop FlowLauncherExporte
   - `format_playtime(seconds: int) -> str | None`
   - `game_subtitle(game: Game) -> str`
 
-- [ ] **Step 1: Write failing tests** — `tests/test_game.py`:
+- [ ] **Step 1: Write failing tests** - `tests/test_game.py`:
 
 ```python
 from datetime import datetime, timezone
@@ -292,7 +292,7 @@ def test_game_subtitle():
 Run: `uv run pytest tests/test_game.py -v`
 Expected: FAIL, `ModuleNotFoundError: No module named 'playnite'`
 
-- [ ] **Step 3: Implement** — `src/plugin/playnite.py`:
+- [ ] **Step 3: Implement** - `src/plugin/playnite.py`:
 
 ```python
 from __future__ import annotations
@@ -409,7 +409,7 @@ git commit -m "feat: add Game model, playnite URIs, and subtitle formatting"
   - `DEFAULT_DATA_DIR = r"%APPDATA%\Playnite"`
   - `PlayniteLibrary(data_dir=DEFAULT_DATA_DIR, cache_dir=None)` with properties `data_dir: Path` (env vars expanded), `library_dir: Path` (raises `PlayniteNotFound` if data dir missing), `games_db: Path` (raises `LibraryNotFound` if missing), `files_dir: Path`, and method `cached_copy(source: Path) -> Path`
 
-- [ ] **Step 1: Write failing tests** — `tests/test_library.py`:
+- [ ] **Step 1: Write failing tests** - `tests/test_library.py`:
 
 ```python
 import pytest
@@ -468,7 +468,7 @@ def test_cached_copy_refreshes_and_prunes_stale(tmp_path):
 Run: `uv run pytest tests/test_library.py -v`
 Expected: FAIL, `ImportError: cannot import name 'PlayniteLibrary'`
 
-- [ ] **Step 3: Implement** — append to `src/plugin/playnite.py` (add `import os`, `import shutil`, `import tempfile` to the imports):
+- [ ] **Step 3: Implement** - append to `src/plugin/playnite.py` (add `import os`, `import shutil`, `import tempfile` to the imports):
 
 ```python
 DEFAULT_DATA_DIR = r"%APPDATA%\Playnite"
@@ -546,9 +546,9 @@ git commit -m "feat: locate Playnite library and cache a lock-free copy of games
   - `PlayniteLibrary.source_names() -> dict` mapping source id -> name; `{}` when `library/sources.db` is missing or unreadable
   - `PlayniteLibrary.games(include_hidden: bool = False) -> list[Game]`; propagates `PlayniteNotFound`/`LibraryNotFound`/`LiteDbError`
 
-Test fixture note: unit tests build a real data-dir shape around litedb-py's committed binary fixtures. Copy `~/projects/litedb-py/tests/fixtures/guids.db` into the repo as `tests/fixtures/guids.db` (tiny file; inspect it first with `LiteDatabase` and adapt assertions to its actual collection/field names — the steps below assert only shape, not content, so they hold regardless). The full end-to-end check is an integration test against the real library copy at `~/projects/games.db`, skipped when absent.
+Test fixture note: unit tests build a real data-dir shape around litedb-py's committed binary fixtures. Copy `~/projects/litedb-py/tests/fixtures/guids.db` into the repo as `tests/fixtures/guids.db` (tiny file; inspect it first with `LiteDatabase` and adapt assertions to its actual collection/field names - the steps below assert only shape, not content, so they hold regardless). The full end-to-end check is an integration test against the real library copy at `~/projects/games.db`, skipped when absent.
 
-- [ ] **Step 1: Copy the fixture and write failing tests** — `tests/test_read.py`:
+- [ ] **Step 1: Copy the fixture and write failing tests** - `tests/test_read.py`:
 
 ```bash
 mkdir -p tests/fixtures
@@ -605,7 +605,7 @@ def test_reads_real_playnite_library(tmp_path):
 Run: `uv run pytest tests/test_read.py -v`
 Expected: FAIL, `AttributeError: 'PlayniteLibrary' object has no attribute 'source_names'`
 
-- [ ] **Step 3: Implement** — append to `PlayniteLibrary` (add `from litedb_py import LiteDatabase, LiteDbError` to imports):
+- [ ] **Step 3: Implement** - append to `PlayniteLibrary` (add `from litedb_py import LiteDatabase, LiteDbError` to imports):
 
 ```python
     def source_names(self) -> dict:
@@ -658,7 +658,7 @@ git commit -m "feat: read games and source names from the Playnite database"
   - `build_context_menu(payload: dict) -> list[Result]`
   - `error_result(title: str, subtitle: str) -> Result` with `json_rpc_action = api.open_setting_dialog()`
 
-- [ ] **Step 1: Write failing tests** — `tests/test_results.py`:
+- [ ] **Step 1: Write failing tests** - `tests/test_results.py`:
 
 ```python
 from playnite import Game
@@ -734,7 +734,7 @@ def test_error_result_opens_settings():
 Run: `uv run pytest tests/test_results.py -v`
 Expected: FAIL, `ModuleNotFoundError: No module named 'results'`
 
-- [ ] **Step 3: Implement** — `src/plugin/results.py`:
+- [ ] **Step 3: Implement** - `src/plugin/results.py`:
 
 ```python
 from __future__ import annotations
@@ -862,7 +862,7 @@ git commit -m "feat: build query results and rich conditional context menu"
 - Consumes: Task 3's `PlayniteLibrary`, `DEFAULT_DATA_DIR`, `PlayniteNotFound`, `LibraryNotFound`; Task 4's `games()`; Task 5's builders; `litedb_py.LiteDbError`; `pyflowlauncher.Plugin`.
 - Produces: the runnable plugin. `settings.py` exposes `as_bool(value, default=False) -> bool`.
 
-- [ ] **Step 1: Write failing tests** — `tests/test_settings.py`:
+- [ ] **Step 1: Write failing tests** - `tests/test_settings.py`:
 
 ```python
 from settings import as_bool
@@ -884,7 +884,7 @@ def test_as_bool_accepts_bools_and_strings():
 Run: `uv run pytest tests/test_settings.py -v`
 Expected: FAIL, `ModuleNotFoundError: No module named 'settings'`
 
-- [ ] **Step 3: Implement** — `src/plugin/settings.py`:
+- [ ] **Step 3: Implement** - `src/plugin/settings.py`:
 
 ```python
 def as_bool(value, default: bool = False) -> bool:
@@ -1002,7 +1002,7 @@ jobs:
       - run: uv run pytest -v
 ```
 
-- [ ] **Step 2: Write `release.yml`** — copy `~/projects/Steam-Search/.github/workflows/release.yml` verbatim (it stages `src/.`, `data/icon.png`, `data/plugin.json`, `data/SettingsTemplate.yaml`, `LICENSE`, pip-installs `requirements.txt` into `plugin/site-packages`, zips as `<repo>-<version>.zip`, and attaches it to the GitHub release). No edits needed; it derives the repo name and version from context.
+- [ ] **Step 2: Write `release.yml`** - copy `~/projects/Steam-Search/.github/workflows/release.yml` verbatim (it stages `src/.`, `data/icon.png`, `data/plugin.json`, `data/SettingsTemplate.yaml`, `LICENSE`, pip-installs `requirements.txt` into `plugin/site-packages`, zips as `<repo>-<version>.zip`, and attaches it to the GitHub release). No edits needed; it derives the repo name and version from context.
 
 - [ ] **Step 3: Write release-please config**
 
@@ -1099,7 +1099,7 @@ donate_handles:
   github-sponsors: Garulf
 ```
 
-- [ ] **Step 2: Create the template** — start from Steam-Search's and adapt:
+- [ ] **Step 2: Create the template** - start from Steam-Search's and adapt:
 
 ```bash
 mkdir -p docs
@@ -1164,7 +1164,7 @@ with LiteDatabase("/home/Garulf/projects/games.db") as db:
 EOF
 ```
 
-Choose 3 well-known games with good playtime values. Then STOP and ask the user to copy those 3 icon files (plus, optionally, the Playnite app icon for the search bar — the repo's `data/icon.png` works as the fallback) from their Windows machine into `~/projects/playnite-media/`, preserving nothing but the filenames. Do not proceed until the files exist.
+Choose 3 well-known games with good playtime values. Then STOP and ask the user to copy those 3 icon files (plus, optionally, the Playnite app icon for the search bar - the repo's `data/icon.png` works as the fallback) from their Windows machine into `~/projects/playnite-media/`, preserving nothing but the filenames. Do not proceed until the files exist.
 
 - [ ] **Step 3: Build the curated config**
 

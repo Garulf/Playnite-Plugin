@@ -1,4 +1,4 @@
-# Playnite Plugin LiteDB Rewrite — Design
+# Playnite Plugin LiteDB Rewrite - Design
 
 Date: 2026-08-24
 Status: Approved pending user review
@@ -88,9 +88,9 @@ dependency-free rather than shipping a companion Playnite extension.
 
 ## Settings (`SettingsTemplate.yaml`)
 
-- `playnite_path` — Playnite data directory override (default
+- `playnite_path` - Playnite data directory override (default
   `%APPDATA%\Playnite`)
-- `show_hidden` — include hidden games (default off)
+- `show_hidden` - include hidden games (default off)
 
 ## Error handling
 
