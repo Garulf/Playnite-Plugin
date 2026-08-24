@@ -6,6 +6,8 @@ project:
   license: MIT
   tagline: Search and launch your Playnite library. Fully local, no Playnite extension required.
   ci_workflow: tests.yml
+screenshots:
+  dir: .github/assets
 badges: [ci, github-release, license]
 donate: [buymeacoffee, github-sponsors]
 donate_handles:

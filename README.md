@@ -26,6 +26,8 @@ Type `pn` followed by a game name:
 pn doom
 ```
 
+![Playnite results in Flow Launcher](.github/assets/screenshot.png)
+
 ## Installation
 
 ### Flow Launcher
@@ -35,6 +37,8 @@ In Flow Launcher, type:
 ```
 pm install playnite
 ```
+
+![Flow Launcher plugin manager installing Playnite](.github/assets/install.png)
 
 ### Manual installation
 
