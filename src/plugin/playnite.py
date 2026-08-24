@@ -7,6 +7,8 @@ from dataclasses import dataclass, field
 from datetime import datetime
 from pathlib import Path
 
+from litedb_py import LiteDatabase, LiteDbError
+
 PLAYNITE_URI_BASE = "playnite://playnite"
 
 
@@ -135,3 +137,24 @@ class PlayniteLibrary:
                 stale.unlink(missing_ok=True)
             shutil.copy(source, cached)
         return cached
+
+    def source_names(self) -> dict:
+        path = self.library_dir / "sources.db"
+        if not path.is_file():
+            return {}
+        try:
+            with LiteDatabase(self.cached_copy(path)) as db:
+                return {
+                    doc["_id"]: doc["Name"]
+                    for name in db.collections
+                    for doc in db[name]
+                    if "_id" in doc and isinstance(doc.get("Name"), str)
+                }
+        except LiteDbError:
+            return {}
+
+    def games(self, include_hidden: bool = False) -> "list[Game]":
+        sources = self.source_names()
+        with LiteDatabase(self.cached_copy(self.games_db)) as db:
+            games = [Game.from_doc(doc, sources) for doc in db["Game"]]
+        return [game for game in games if include_hidden or not game.hidden]
