@@ -23,7 +23,7 @@ Search and launch your Playnite library. Fully local, no Playnite extension requ
 Type `pn` followed by a game name:
 
 ```
-pn doom
+pn cyber
 ```
 
 ![Playnite results in Flow Launcher](.github/assets/screenshot.png)
