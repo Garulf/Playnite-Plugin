@@ -42,7 +42,7 @@ pm install playnite
 
 ### Manual installation
 
-Download `Playnite-Plugin.zip` from the [latest release](https://github.com/Garulf/Playnite-Plugin/releases/latest) and unzip it into
+Download `Playnite-Plugin-<version>.zip` from the [latest release](https://github.com/Garulf/Playnite-Plugin/releases/latest) and unzip it into
 `%appdata%\FlowLauncher\Plugins`, then restart Flow Launcher.
 
 ## Changelog
