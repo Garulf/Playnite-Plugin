@@ -30,8 +30,9 @@ data/
 src/
   run.py                 # generic shim, verbatim copy from Steam-Search
   plugin/
-    __main__.py          # pyflowlauncher Plugin, query handler, context menu
+    __main__.py          # pyflowlauncher Plugin wiring, query handler
     playnite.py          # library location, DB copy/cache, Game model, URIs
+    results.py           # Result/context-menu/error-result builders (testable)
 tests/                   # pytest, run via tox
 docs/README.md.j2        # readwright template
 readme.yaml              # readwright config
@@ -46,8 +47,10 @@ requirements.txt         # pyflowlauncher, litedb-py
   plugin copies `games.db` to a temp/cache location and opens the copy with
   `LiteDatabase`. The copy is cached keyed on the source file's mtime and
   size; unchanged source means no re-copy.
-- Read the `Game` collection. Resolve source names from the `Source`
-  collection by GUID (`SourceId` on game documents).
+- Read the `Game` collection from `games.db` (verified against a real
+  library: it contains only `Game`). Source names live in a sibling
+  `library\sources.db`; resolve `SourceId` GUIDs against it when present,
+  and degrade to no source label when it is missing or unreadable.
 - `Game` model fields: `Id`, `Name`, `IsInstalled`, `InstallDirectory`,
   `Icon`, `CoverImage`, `Hidden`, `Playtime`, `LastActivity`, `Links`,
   source name.
