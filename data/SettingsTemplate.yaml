@@ -1,0 +1,18 @@
+body:
+  - type: textBlock
+    attributes:
+      name: description
+      description: >
+        Search and launch your Playnite library.
+  - type: input
+    attributes:
+      name: playnite_path
+      label: "Playnite Data Directory:"
+      defaultValue: "%APPDATA%\\Playnite"
+      description: Playnite data directory (the folder containing "library"). Change this for portable installs.
+  - type: checkbox
+    attributes:
+      name: show_hidden
+      label: "Show Hidden Games"
+      defaultValue: "false"
+      description: Include games marked hidden in Playnite.

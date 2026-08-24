@@ -1,1 +1,2 @@
-flox-lib==0.18.1
+pyflowlauncher==1.1.0
+litedb-py @ git+https://github.com/Garulf/litedb-py@aa0eae5642cce272bcb68e1bad294cf3419c2f5a
