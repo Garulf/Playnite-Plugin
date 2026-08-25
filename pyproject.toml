@@ -5,7 +5,7 @@ description = "Search and launch your Playnite library from Flow Launcher."
 requires-python = ">=3.12"
 license = "MIT"
 dependencies = [
-    "pyflowlauncher==1.1.0",
+    "pyflowlauncher==1.1.1",
     "litedb-py @ git+https://github.com/Garulf/litedb-py@aa0eae5642cce272bcb68e1bad294cf3419c2f5a",
 ]
 
