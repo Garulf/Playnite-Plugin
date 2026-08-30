@@ -1,6 +1,6 @@
 [project]
 name = "playnite-plugin"
-version = "3.0.0"
+version = "3.1.0"
 description = "Search and launch your Playnite library from Flow Launcher."
 requires-python = ">=3.12"
 license = "MIT"
