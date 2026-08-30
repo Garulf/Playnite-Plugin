@@ -1,49 +1,62 @@
+import json
+
 import pytest
 
 from playnite import LibraryNotFound, PlayniteLibrary, PlayniteNotFound
 
+GAMES = [
+    {"Id": "033b6530-47a6-4179-a8fa-c1197ea4f335", "Name": "Doom", "IsInstalled": True, "Hidden": False},
+    {"Id": "7f5440ce-70e1-4c3b-a33f-09ed280284eb", "Name": "Secret", "IsInstalled": False, "Hidden": True},
+]
 
-def make_data_dir(tmp_path, with_db=True):
-    library = tmp_path / "Playnite" / "library"
-    library.mkdir(parents=True)
-    if with_db:
-        (library / "games.db").write_bytes(b"original")
+
+def make_data_dir(tmp_path, payload=GAMES, encoding="utf-8-sig"):
+    exporter_dir = tmp_path / "Playnite" / "ExtensionsData" / "FlowLauncherExporter"
+    exporter_dir.mkdir(parents=True)
+    if payload is not None:
+        (exporter_dir / "library.json").write_text(json.dumps(payload), encoding=encoding)
     return tmp_path / "Playnite"
 
 
 def test_missing_data_dir_raises(tmp_path):
-    lib = PlayniteLibrary(tmp_path / "nope", cache_dir=tmp_path / "cache")
+    lib = PlayniteLibrary(tmp_path / "nope")
     with pytest.raises(PlayniteNotFound):
-        _ = lib.library_dir
+        lib.games()
 
 
-def test_missing_games_db_raises(tmp_path):
-    lib = PlayniteLibrary(make_data_dir(tmp_path, with_db=False), cache_dir=tmp_path / "cache")
+def test_missing_library_json_raises(tmp_path):
+    lib = PlayniteLibrary(make_data_dir(tmp_path, payload=None))
     with pytest.raises(LibraryNotFound):
-        _ = lib.games_db
+        lib.games()
 
 
 def test_env_vars_expanded(monkeypatch, tmp_path):
     monkeypatch.setenv("PLAYNITE_TEST_HOME", str(tmp_path))
-    lib = PlayniteLibrary("$PLAYNITE_TEST_HOME/Playnite", cache_dir=tmp_path / "cache")
+    lib = PlayniteLibrary("$PLAYNITE_TEST_HOME/Playnite")
     assert lib.data_dir == tmp_path / "Playnite"
 
 
-def test_cached_copy_creates_and_reuses(tmp_path):
-    data_dir = make_data_dir(tmp_path)
-    lib = PlayniteLibrary(data_dir, cache_dir=tmp_path / "cache")
-    first = lib.cached_copy(lib.games_db)
-    assert first.read_bytes() == b"original"
-    first.write_bytes(b"tampered")
-    assert lib.cached_copy(lib.games_db).read_bytes() == b"tampered"  # unchanged source: no re-copy
+def test_games_reads_exporter_library(tmp_path):
+    lib = PlayniteLibrary(make_data_dir(tmp_path))
+    games = lib.games(include_hidden=True)
+    assert [game.name for game in games] == ["Doom", "Secret"]
 
 
-def test_cached_copy_refreshes_and_prunes_stale(tmp_path):
-    data_dir = make_data_dir(tmp_path)
-    lib = PlayniteLibrary(data_dir, cache_dir=tmp_path / "cache")
-    first = lib.cached_copy(lib.games_db)
-    (data_dir / "library" / "games.db").write_bytes(b"changed!!")
-    second = lib.cached_copy(lib.games_db)
-    assert second.read_bytes() == b"changed!!"
-    assert second != first
-    assert not first.exists()
+def test_games_filters_hidden_by_default(tmp_path):
+    lib = PlayniteLibrary(make_data_dir(tmp_path))
+    assert [game.name for game in lib.games()] == ["Doom"]
+
+
+def test_games_reads_plain_utf8(tmp_path):
+    lib = PlayniteLibrary(make_data_dir(tmp_path, encoding="utf-8"))
+    assert len(lib.games(include_hidden=True)) == 2
+
+
+def test_single_game_object_payload(tmp_path):
+    lib = PlayniteLibrary(make_data_dir(tmp_path, payload=GAMES[0]))
+    assert [game.name for game in lib.games()] == ["Doom"]
+
+
+def test_files_dir_under_library(tmp_path):
+    lib = PlayniteLibrary(make_data_dir(tmp_path))
+    assert lib.files_dir == tmp_path / "Playnite" / "library" / "files"

@@ -3,13 +3,12 @@
 {% block usage %}
 ## Features
 
-* **No Playnite extension required.** Reads `games.db` directly with litedb-py.
 * **Fully local.** No web requests, no API keys.
 * **Fuzzy matching.** `pn rdr2` will match Red Dead Redemption 2.
-* **Icons and cover art.** Game icons in results, cover art on `F1`.
+* **Game icons** shown right in the results.
 * **All your sources.** Every library Playnite knows about, in one search.
 * **Launch or open.** Installed games launch directly; uninstalled games open their Playnite page.
-* **Rich context menu.** Open install folder, jump to store links, copy the game id.
+* **Context menu.** Open install folder, copy the game id.
 * **Hidden games, opt-in.** Include games hidden in Playnite via a setting.
 
 ## Usage
@@ -23,6 +22,14 @@ pn cyber
 {{ screenshot("screenshot", alt="Playnite results in Flow Launcher") }}
 
 ## Installation
+
+### Playnite
+
+The plugin reads the library index written by the
+[FlowLauncherExporter](https://github.com/Garulf/FlowLauncherExporter) Playnite extension.
+Install it from Playnite's add-on browser (search for "Flow Launcher Exporter"), or open
+`playnite://playnite/installaddon/FlowLauncherExporter`. If it's missing, the plugin offers a
+one-click install from the search results.
 
 ### Flow Launcher
 

@@ -21,11 +21,6 @@ wheels = [
 ]
 
 [[package]]
-name = "litedb-py"
-version = "0.1.0"
-source = { git = "https://github.com/Garulf/litedb-py?rev=aa0eae5642cce272bcb68e1bad294cf3419c2f5a#aa0eae5642cce272bcb68e1bad294cf3419c2f5a" }
-
-[[package]]
 name = "packaging"
 version = "26.3"
 source = { registry = "https://pypi.org/simple" }
@@ -39,7 +34,6 @@ name = "playnite-plugin"
 version = "3.0.0"
 source = { virtual = "." }
 dependencies = [
-    { name = "litedb-py" },
     { name = "pyflowlauncher" },
 ]
 
@@ -49,10 +43,7 @@ dev = [
 ]
 
 [package.metadata]
-requires-dist = [
-    { name = "litedb-py", git = "https://github.com/Garulf/litedb-py?rev=aa0eae5642cce272bcb68e1bad294cf3419c2f5a" },
-    { name = "pyflowlauncher", specifier = "==1.1.1" },
-]
+requires-dist = [{ name = "pyflowlauncher", specifier = "==1.1.1" }]
 
 [package.metadata.requires-dev]
 dev = [{ name = "pytest", specifier = ">=8" }]

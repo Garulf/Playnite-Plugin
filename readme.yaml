@@ -4,7 +4,7 @@ project:
   owner: Garulf
   repo: Playnite-Plugin
   license: MIT
-  tagline: Search and launch your Playnite library. Fully local, no Playnite extension required.
+  tagline: Search and launch your Playnite library from Flow Launcher.
   ci_workflow: tests.yml
 screenshots:
   dir: .github/assets

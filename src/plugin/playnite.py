@@ -1,15 +1,12 @@
 from __future__ import annotations
 
+import json
 import os
-import shutil
-import tempfile
-from dataclasses import dataclass, field
-from datetime import datetime
+from dataclasses import dataclass
 from pathlib import Path
 
-from litedb_py import LiteDatabase, LiteDbError
-
 PLAYNITE_URI_BASE = "playnite://playnite"
+EXPORTER_NAME = "FlowLauncherExporter"
 
 
 def start_uri(game_id: str) -> str:
@@ -43,31 +40,21 @@ class Game:
     hidden: bool = False
     install_directory: str | None = None
     icon: str | None = None
-    cover_image: str | None = None
     playtime: int = 0
-    last_activity: datetime | None = None
-    links: list[dict] = field(default_factory=list)
     source: str | None = None
 
     @classmethod
-    def from_doc(cls, doc: dict, source_names: dict) -> Game:
-        links = [
-            {"name": link.get("Name") or "Link", "url": link["Url"]}
-            for link in (doc.get("Links") or [])
-            if link.get("Url")
-        ]
+    def from_export(cls, doc: dict) -> Game:
+        source = doc.get("Source") or {}
         return cls(
-            id=str(doc["_id"]),
+            id=str(doc["Id"]),
             name=doc.get("Name") or "",
             is_installed=bool(doc.get("IsInstalled")),
             hidden=bool(doc.get("Hidden")),
             install_directory=doc.get("InstallDirectory") or None,
             icon=doc.get("Icon") or None,
-            cover_image=doc.get("CoverImage") or None,
             playtime=int(doc.get("Playtime") or 0),
-            last_activity=doc.get("LastActivity"),
-            links=links,
-            source=source_names.get(doc.get("SourceId")),
+            source=source.get("Name") or None,
         )
 
     @property
@@ -85,13 +72,10 @@ def game_subtitle(game: Game) -> str:
         "Installed" if game.is_installed else "Not installed",
         format_playtime(game.playtime),
     ]
-    if game.last_activity:
-        parts.append(f"last played {game.last_activity.date().isoformat()}")
     return " · ".join(part for part in parts if part)
 
 
 DEFAULT_DATA_DIR = r"%APPDATA%\Playnite"
-CACHE_DIR_NAME = "flow-playnite-plugin"
 
 
 class PlayniteNotFound(Exception):
@@ -103,58 +87,30 @@ class PlayniteNotFound(Exception):
 class LibraryNotFound(Exception):
     def __init__(self, path: Path):
         self.path = path
-        super().__init__(f"Playnite library database not found: {path}")
+        super().__init__(f"Playnite library export not found: {path}")
 
 
 class PlayniteLibrary:
-    def __init__(self, data_dir: "str | os.PathLike" = DEFAULT_DATA_DIR, cache_dir: "str | os.PathLike | None" = None):
+    def __init__(self, data_dir: "str | os.PathLike" = DEFAULT_DATA_DIR):
         self.data_dir = Path(os.path.expandvars(str(data_dir)))
-        self.cache_dir = Path(cache_dir) if cache_dir else Path(tempfile.gettempdir(), CACHE_DIR_NAME)
 
     @property
-    def library_dir(self) -> Path:
+    def library_json(self) -> Path:
         if not self.data_dir.is_dir():
             raise PlayniteNotFound(self.data_dir)
-        return self.data_dir / "library"
-
-    @property
-    def games_db(self) -> Path:
-        path = self.library_dir / "games.db"
+        path = self.data_dir / "ExtensionsData" / EXPORTER_NAME / "library.json"
         if not path.is_file():
             raise LibraryNotFound(path)
         return path
 
     @property
     def files_dir(self) -> Path:
-        return self.library_dir / "files"
-
-    def cached_copy(self, source: Path) -> Path:
-        stat = source.stat()
-        cached = self.cache_dir / f"{source.stem}-{stat.st_mtime_ns}-{stat.st_size}.db"
-        if not cached.is_file():
-            self.cache_dir.mkdir(parents=True, exist_ok=True)
-            for stale in self.cache_dir.glob(f"{source.stem}-*.db"):
-                stale.unlink(missing_ok=True)
-            shutil.copy(source, cached)
-        return cached
-
-    def source_names(self) -> dict:
-        path = self.library_dir / "sources.db"
-        if not path.is_file():
-            return {}
-        try:
-            with LiteDatabase(self.cached_copy(path)) as db:
-                return {
-                    doc["_id"]: doc["Name"]
-                    for name in db.collections
-                    for doc in db[name]
-                    if "_id" in doc and isinstance(doc.get("Name"), str)
-                }
-        except LiteDbError:
-            return {}
+        return self.data_dir / "library" / "files"
 
     def games(self, include_hidden: bool = False) -> "list[Game]":
-        sources = self.source_names()
-        with LiteDatabase(self.cached_copy(self.games_db)) as db:
-            games = [Game.from_doc(doc, sources) for doc in db["Game"]]
+        with open(self.library_json, encoding="utf-8-sig") as f:
+            data = json.load(f)
+        if isinstance(data, dict):
+            data = [data]
+        games = [Game.from_export(doc) for doc in data]
         return [game for game in games if include_hidden or not game.hidden]

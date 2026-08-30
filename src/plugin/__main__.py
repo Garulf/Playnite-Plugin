@@ -1,8 +1,7 @@
-from litedb_py import LiteDbError
 from pyflowlauncher import Plugin
 
 from playnite import DEFAULT_DATA_DIR, LibraryNotFound, PlayniteLibrary, PlayniteNotFound
-from results import build_context_menu, build_result, error_result
+from results import build_context_menu, build_result, error_result, install_exporter_result
 from settings import as_bool
 
 plugin = Plugin()
@@ -20,13 +19,10 @@ async def query(query: str):
     except PlayniteNotFound as error:
         yield error_result("Playnite not found", f"Nothing at {error.path}. Set the data directory in settings.")
         return
-    except LibraryNotFound as error:
-        yield error_result("Playnite library not found", f"No database at {error.path}.")
+    except LibraryNotFound:
+        yield install_exporter_result()
         return
-    except LiteDbError as error:
-        yield error_result("Could not read the Playnite library", str(error))
-        return
-    except OSError as error:
+    except (OSError, ValueError) as error:
         yield error_result("Could not read the Playnite library", str(error))
         return
     for game in games:
