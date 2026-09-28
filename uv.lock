@@ -52,7 +52,7 @@ dev = [
 [package.metadata]
 requires-dist = [
     { name = "litedb-py", git = "https://github.com/Garulf/litedb-py?rev=aa0eae5642cce272bcb68e1bad294cf3419c2f5a" },
-    { name = "pyflowlauncher", specifier = "==1.1.2" },
+    { name = "pyflowlauncher", specifier = "==1.2.1" },
 ]
 
 [package.metadata.requires-dev]
@@ -72,11 +72,11 @@ wheels = [
 
 [[package]]
 name = "pyflowlauncher"
-version = "1.1.2"
+version = "1.2.1"
 source = { registry = "https://pypi.org/simple" }
-sdist = { url = "https://files.pythonhosted.org/packages/4c/90/196e88d3f131256692d1e3010955bba4976c0c1a41a45f1d0ad057b54e74/pyflowlauncher-1.1.2.tar.gz", hash = "sha256:b1b1185013af89d90a3de5e480a151804b1912255b41b54c556cffe6877d77b3", size = 17677, upload-time = "2026-08-30T14:52:55.678Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/f4/4a/04f20e61f10798a0314d9245933037ef5be1082f2ad747d9b5f15fe0e404/pyflowlauncher-1.2.1.tar.gz", hash = "sha256:7ff797255255ff02202c1a732b2fecd2ad834d2fed1e61dc70679787322212c9", size = 20077, upload-time = "2026-09-04T00:24:27.923Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/7a/3e/c79cde396a5b4730e08cc1d8b0a12e5929f06f73fe85e0e69a9978979fd1/pyflowlauncher-1.1.2-py3-none-any.whl", hash = "sha256:24757ff3f000cffa514d8d05af3014c6118f085066665c323c32e71d2be711f4", size = 22399, upload-time = "2026-08-30T14:52:54.397Z" },
+    { url = "https://files.pythonhosted.org/packages/7d/60/6fc9febdbac341c9d2283c9120d28c3cb907974ac93ba5acd243430b203f/pyflowlauncher-1.2.1-py3-none-any.whl", hash = "sha256:8942f01aaefd6fc103cc8f14f788ef16a28adf6f9353433e4258c99de2bee077", size = 24968, upload-time = "2026-09-04T00:24:26.797Z" },
 ]
 
 [[package]]
