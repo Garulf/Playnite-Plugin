@@ -8,6 +8,7 @@ from playnite import Game
 
 DEFAULT_PORT = 38217
 DEFAULT_TIMEOUT = 0.3
+EXTENSION_URL = "https://github.com/Garulf/playnite-library-server/releases/latest"
 
 
 class LibraryServerUnavailable(Exception):

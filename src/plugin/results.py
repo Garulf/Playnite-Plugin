@@ -3,9 +3,11 @@ from __future__ import annotations
 from pathlib import Path
 
 from pyflowlauncher import Result, api
+from pyflowlauncher.icons import LOCK as LOCK_ICON
 from pyflowlauncher.icons import SETTINGS as SETTINGS_ICON
 from pyflowlauncher.models.result import PreviewInfo
 
+from library_server import EXTENSION_URL as LIBRARY_SERVER_EXTENSION_URL
 from playnite import Game, game_subtitle, media_path, show_game_uri, start_uri
 
 
@@ -94,4 +96,13 @@ def error_result(title: str, subtitle: str) -> Result:
         subtitle=subtitle,
         icon=SETTINGS_ICON,
         json_rpc_action=api.open_setting_dialog(),
+    )
+
+
+def library_locked_result() -> Result:
+    return Result(
+        title="Could not connect to the playnite-library-server extension",
+        subtitle="Press Enter to install the extension",
+        icon=LOCK_ICON,
+        json_rpc_action=api.open_url(LIBRARY_SERVER_EXTENSION_URL),
     )

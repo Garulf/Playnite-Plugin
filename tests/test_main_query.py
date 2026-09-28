@@ -4,6 +4,8 @@ from unittest.mock import Mock
 
 import pytest
 
+from playnite import LibraryLocked
+
 MAIN_PATH = Path(__file__).parent.parent / "src" / "plugin" / "__main__.py"
 
 
@@ -64,3 +66,22 @@ async def test_query_reports_bad_playnite_path_even_when_server_has_data(monkeyp
 
     assert len(results) == 1
     assert "not found" in results[0].title.lower()
+
+
+@pytest.mark.asyncio
+async def test_query_suggests_library_server_when_playnite_locks_library(monkeypatch, tmp_path):
+    main = load_main()
+
+    def raise_locked(**kwargs):
+        raise LibraryLocked(tmp_path / "library" / "games.db")
+
+    monkeypatch.setattr(main, "library_source_games", raise_locked)
+
+    fake_launcher = Mock()
+    fake_launcher.settings = {"playnite_path": str(tmp_path)}
+    monkeypatch.setattr(main.plugin, "_launcher", fake_launcher)
+
+    results = [item async for item in main.query("")]
+
+    assert len(results) == 1
+    assert "playnite-library-server" in results[0].title

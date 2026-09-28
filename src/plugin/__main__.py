@@ -3,8 +3,8 @@ from pyflowlauncher import Plugin
 
 from library_server import DEFAULT_PORT as DEFAULT_LIBRARY_SERVER_PORT
 from library_source import games as library_source_games
-from playnite import DEFAULT_DATA_DIR, LibraryNotFound, PlayniteLibrary, PlayniteNotFound
-from results import build_context_menu, build_result, error_result
+from playnite import DEFAULT_DATA_DIR, LibraryLocked, LibraryNotFound, PlayniteLibrary, PlayniteNotFound
+from results import build_context_menu, build_result, error_result, library_locked_result
 from settings import as_bool
 
 plugin = Plugin()
@@ -39,6 +39,9 @@ async def query(query: str):
         return
     except LibraryNotFound as error:
         yield error_result("Playnite library not found", f"No database at {error.path}.")
+        return
+    except LibraryLocked:
+        yield library_locked_result()
         return
     except LiteDbError as error:
         yield error_result("Could not read the Playnite library", str(error))

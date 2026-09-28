@@ -2,7 +2,7 @@ import shutil
 
 import pytest
 
-from playnite import LibraryNotFound, PlayniteLibrary, PlayniteNotFound
+from playnite import LibraryLocked, LibraryNotFound, PlayniteLibrary, PlayniteNotFound
 
 
 def make_data_dir(tmp_path, with_db=True):
@@ -79,5 +79,6 @@ def test_cached_copy_raises_when_locked_with_no_previous_snapshot(tmp_path, monk
         raise PermissionError(13, "Permission denied")
 
     monkeypatch.setattr(shutil, "copy", locked_copy)
-    with pytest.raises(PermissionError):
+    with pytest.raises(LibraryLocked) as raised:
         lib.cached_copy(lib.games_db)
+    assert raised.value.path == lib.games_db
