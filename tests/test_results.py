@@ -1,5 +1,5 @@
 from playnite import Game
-from results import build_context_menu, build_result, context_payload, error_result
+from results import build_context_menu, build_result, context_payload, error_result, library_locked_result
 
 
 def game(**overrides):
@@ -70,3 +70,9 @@ def test_context_menu_actions(tmp_path):
 def test_error_result_opens_settings():
     result = error_result("Playnite not found", "Set the path in settings")
     assert "SettingDialog" in result.json_rpc_action["Method"] or "setting" in result.json_rpc_action["Method"].lower()
+
+
+def test_library_locked_result_points_at_library_server_extension():
+    result = library_locked_result()
+    assert "playnite-library-server" in result.title
+    assert result.json_rpc_action["Parameters"][0] == "https://github.com/Garulf/playnite-library-server/releases/latest"

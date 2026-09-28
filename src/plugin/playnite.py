@@ -141,6 +141,12 @@ class LibraryNotFound(Exception):
         super().__init__(f"Playnite library database not found: {path}")
 
 
+class LibraryLocked(Exception):
+    def __init__(self, path: Path):
+        self.path = path
+        super().__init__(f"Playnite has locked its library database: {path}")
+
+
 class PlayniteLibrary:
     def __init__(self, data_dir: "str | os.PathLike" = DEFAULT_DATA_DIR, cache_dir: "str | os.PathLike | None" = None):
         self.data_dir = Path(os.path.expandvars(str(data_dir)))
@@ -172,14 +178,14 @@ class PlayniteLibrary:
         stale = sorted(self.cache_dir.glob(f"{source.stem}-*.db"))
         try:
             shutil.copy(source, cached)
-        except PermissionError:
+        except PermissionError as error:
             # Playnite opens games.db/sources.db with LiteDB's Mode=Exclusive
             # for its entire run, so the file is unreadable the whole time
             # Playnite is open. Serve the last snapshot we could read instead
             # of failing outright.
             if stale:
                 return stale[-1]
-            raise
+            raise LibraryLocked(source) from error
         for old in stale:
             old.unlink(missing_ok=True)
         return cached
