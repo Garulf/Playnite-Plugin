@@ -1,5 +1,23 @@
 # Changelog
 
+## [3.2.0](https://github.com/Garulf/Playnite-Plugin/compare/v3.1.0...v3.2.0) (2026-09-28)
+
+
+### Features
+
+* add Hide Uninstalled Games setting ([#64](https://github.com/Garulf/Playnite-Plugin/issues/64)) ([cc65f38](https://github.com/Garulf/Playnite-Plugin/commit/cc65f381fd0e4bd336cf107a72ca5eefb84cb9bb))
+
+
+### Bug Fixes
+
+* **deps:** bump pyflowlauncher from 1.1.2 to 1.2.1 ([11c7498](https://github.com/Garulf/Playnite-Plugin/commit/11c7498dec5ba8c812d1727634e186d3c4176435))
+* suggest playnite-library-server when Playnite locks the database ([#67](https://github.com/Garulf/Playnite-Plugin/issues/67)) ([f338e54](https://github.com/Garulf/Playnite-Plugin/commit/f338e540b343e7109d0eca69cc2b4cc027b24290))
+
+
+### Documentation
+
+* point readers at the playnite-library-server extension ([6510038](https://github.com/Garulf/Playnite-Plugin/commit/65100384099d73aebe3a97426a813b338d8dabe3))
+
 ## [3.1.0](https://github.com/Garulf/Playnite-Plugin/compare/v3.0.0...v3.1.0) (2026-08-30)
 
 
