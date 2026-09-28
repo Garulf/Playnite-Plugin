@@ -22,3 +22,9 @@ body:
       label: "Show Hidden Games"
       defaultValue: "false"
       description: Include games marked hidden in Playnite.
+  - type: checkbox
+    attributes:
+      name: hide_uninstalled
+      label: "Hide Uninstalled Games"
+      defaultValue: "true"
+      description: Only show installed games in search results.

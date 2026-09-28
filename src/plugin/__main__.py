@@ -21,6 +21,10 @@ def library_server_port() -> int:
         return DEFAULT_LIBRARY_SERVER_PORT
 
 
+def hide_uninstalled() -> bool:
+    return as_bool(plugin.settings.get("hide_uninstalled"), default=True)
+
+
 @plugin.on_method
 async def query(query: str):
     lib = library()
@@ -49,6 +53,8 @@ async def query(query: str):
     except OSError as error:
         yield error_result("Could not read the Playnite library", str(error))
         return
+    if hide_uninstalled():
+        games = [game for game in games if game.is_installed]
     for game in games:
         score = 0
         if query:
