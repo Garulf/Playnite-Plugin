@@ -75,9 +75,9 @@ def test_format_playtime():
 
 def test_game_subtitle():
     game = Game.from_doc(doc(), {SOURCE_ID: "Steam"})
-    assert game_subtitle(game) == "Steam · Installed · 2h played · last played 2026-08-14"
+    assert game_subtitle(game) == "Steam · 2h played · last played 2026-08-14"
     bare = Game.from_doc({"_id": UUID(GAME_ID), "Name": "Bare"}, {})
-    assert game_subtitle(bare) == "Not installed"
+    assert game_subtitle(bare) == ""
 
 
 API_PAYLOAD = {

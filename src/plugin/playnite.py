@@ -117,7 +117,6 @@ class Game:
 def game_subtitle(game: Game) -> str:
     parts = [
         game.source,
-        "Installed" if game.is_installed else "Not installed",
         format_playtime(game.playtime),
     ]
     if game.last_activity:
