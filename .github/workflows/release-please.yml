@@ -85,7 +85,7 @@ jobs:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           pr="$(gh pr list --repo "$GITHUB_REPOSITORY" --state open --label "autorelease: pending" \
-            --json number,headRefName --jq '.[0] // empty')"
+            --json number,headRefName,body --jq '.[0] // empty')"
           if [ -z "$pr" ]; then
             echo "No open release PR"
             exit 0
@@ -95,6 +95,7 @@ jobs:
           branch="$(jq -r .headRefName <<< "$pr")"
           version="$(gh api "repos/$GITHUB_REPOSITORY/contents/data/plugin.json?ref=$branch" \
             -H "Accept: application/vnd.github.raw" | jq -r .Version)"
+          jq -r .body <<< "$pr" | awk '/^---$/ { section++; next } section == 1' > "$RUNNER_TEMP/notes.md"
           {
             echo "number=$number"
             echo "version=$version"
@@ -125,7 +126,6 @@ jobs:
         shell: bash
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          PR_NUMBER: ${{ steps.pr.outputs.number }}
           TAG: ${{ steps.pr.outputs.tag }}
         run: |
           gh release list --limit 100 --json tagName,isPrerelease \
@@ -139,4 +139,4 @@ jobs:
             --latest=false \
             --target "$GITHUB_SHA" \
             --title "$TAG" \
-            --notes "Build of main at $GITHUB_SHA with the version from release PR #$PR_NUMBER. Replaced on every push to main and deleted once the release ships."
+            --notes-file "$RUNNER_TEMP/notes.md"
