@@ -3,6 +3,7 @@ name: release-please
 on:
   push:
     branches: [main]
+  workflow_dispatch:
 
 permissions:
   contents: write
@@ -17,8 +18,6 @@ jobs:
     outputs:
       release_created: ${{ steps.release-please.outputs.release_created }}
       tag_name: ${{ steps.release-please.outputs.tag_name }}
-      prs_created: ${{ steps.release-please.outputs.prs_created }}
-      pr: ${{ steps.release-please.outputs.pr }}
     steps:
       - uses: googleapis/release-please-action@v5
         id: release-please
@@ -70,39 +69,64 @@ jobs:
     name: Publish release PR pre-release
     runs-on: ubuntu-latest
     needs: release-please
-    if: ${{ needs.release-please.outputs.prs_created == 'true' }}
+    if: ${{ github.ref == 'refs/heads/main' && needs.release-please.outputs.release_created != 'true' }}
+    concurrency:
+      group: prerelease
+      cancel-in-progress: true
     permissions:
       contents: write
+      pull-requests: read
 
     steps:
-      - name: Checkout release PR branch
-        uses: actions/checkout@v7
-        with:
-          ref: ${{ fromJSON(needs.release-please.outputs.pr).headBranchName }}
-
-      - name: Read version
-        id: version
-        shell: bash
-        run: |
-          version="$(jq -r .Version data/plugin.json)"
-          {
-            echo "version=$version"
-            echo "tag=v$version-pre"
-            echo "sha=$(git rev-parse HEAD)"
-          } >> "$GITHUB_OUTPUT"
-
-      - name: Build archive
-        id: build
-        uses: ./.github/actions/build-plugin
-        with:
-          version: ${{ steps.version.outputs.version }}-pre
-          python-version: ${{ env.PYTHON_VER }}
-
-      - name: Replace pre-release
+      - name: Find release PR
+        id: pr
         shell: bash
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          PR_NUMBER: ${{ fromJSON(needs.release-please.outputs.pr).number }}
+        run: |
+          pr="$(gh pr list --repo "$GITHUB_REPOSITORY" --state open --label "autorelease: pending" \
+            --json number,headRefName --jq '.[0] // empty')"
+          if [ -z "$pr" ]; then
+            echo "No open release PR"
+            exit 0
+          fi
+
+          number="$(jq -r .number <<< "$pr")"
+          branch="$(jq -r .headRefName <<< "$pr")"
+          version="$(gh api "repos/$GITHUB_REPOSITORY/contents/data/plugin.json?ref=$branch" \
+            -H "Accept: application/vnd.github.raw" | jq -r .Version)"
+          {
+            echo "number=$number"
+            echo "version=$version"
+            echo "tag=v$version-pre"
+          } >> "$GITHUB_OUTPUT"
+
+      - name: Checkout
+        if: ${{ steps.pr.outputs.number }}
+        uses: actions/checkout@v7
+
+      - name: Set release PR version
+        if: ${{ steps.pr.outputs.number }}
+        shell: bash
+        run: |
+          jq --arg version "${{ steps.pr.outputs.version }}" '.Version = $version' data/plugin.json > "$RUNNER_TEMP/plugin.json"
+          mv "$RUNNER_TEMP/plugin.json" data/plugin.json
+
+      - name: Build archive
+        if: ${{ steps.pr.outputs.number }}
+        id: build
+        uses: ./.github/actions/build-plugin
+        with:
+          version: ${{ steps.pr.outputs.version }}-pre
+          python-version: ${{ env.PYTHON_VER }}
+
+      - name: Replace pre-release
+        if: ${{ steps.pr.outputs.number }}
+        shell: bash
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          PR_NUMBER: ${{ steps.pr.outputs.number }}
+          TAG: ${{ steps.pr.outputs.tag }}
         run: |
           gh release list --limit 100 --json tagName,isPrerelease \
             --jq '.[] | select(.isPrerelease and (.tagName | endswith("-pre"))) | .tagName' |
@@ -110,9 +134,9 @@ jobs:
               gh release delete "$tag" --cleanup-tag --yes
             done
 
-          gh release create "${{ steps.version.outputs.tag }}" "${{ steps.build.outputs.zip_path }}" \
+          gh release create "$TAG" "${{ steps.build.outputs.zip_path }}" \
             --prerelease \
             --latest=false \
-            --target "${{ steps.version.outputs.sha }}" \
-            --title "${{ steps.version.outputs.tag }}" \
-            --notes "Build of release PR #$PR_NUMBER at ${{ steps.version.outputs.sha }}. Replaced whenever the release PR updates and deleted once it is released."
+            --target "$GITHUB_SHA" \
+            --title "$TAG" \
+            --notes "Build of main at $GITHUB_SHA with the version from release PR #$PR_NUMBER. Replaced on every push to main and deleted once the release ships."
