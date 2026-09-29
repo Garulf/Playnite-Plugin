@@ -1,5 +1,12 @@
 # Changelog
 
+## [3.3.0](https://github.com/Garulf/Playnite-Plugin/compare/v3.2.0...v3.3.0) (2026-09-29)
+
+
+### Features
+
+* only show install status for uninstalled games ([#68](https://github.com/Garulf/Playnite-Plugin/issues/68)) ([9e3fee5](https://github.com/Garulf/Playnite-Plugin/commit/9e3fee5ce93c0f32e81c258e144027cbf8a575f8))
+
 ## [3.2.0](https://github.com/Garulf/Playnite-Plugin/compare/v3.1.0...v3.2.0) (2026-09-28)
 
 
