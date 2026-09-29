@@ -77,7 +77,7 @@ def test_game_subtitle():
     game = Game.from_doc(doc(), {SOURCE_ID: "Steam"})
     assert game_subtitle(game) == "Steam · 2h played · last played 2026-08-14"
     bare = Game.from_doc({"_id": UUID(GAME_ID), "Name": "Bare"}, {})
-    assert game_subtitle(bare) == ""
+    assert game_subtitle(bare) == "Not installed"
 
 
 API_PAYLOAD = {
