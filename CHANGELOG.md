@@ -1,5 +1,12 @@
 # Changelog
 
+## [3.3.1](https://github.com/Garulf/Playnite-Plugin/compare/v3.3.0...v3.3.1) (2026-10-14)
+
+
+### Bug Fixes
+
+* **deps:** bump pyflowlauncher from 1.2.1 to 1.2.2 ([#74](https://github.com/Garulf/Playnite-Plugin/issues/74)) ([712a3ed](https://github.com/Garulf/Playnite-Plugin/commit/712a3edf69b8153ce21cab3105401561fb47bf1b))
+
 ## [3.3.0](https://github.com/Garulf/Playnite-Plugin/compare/v3.2.0...v3.3.0) (2026-09-29)
 
 
