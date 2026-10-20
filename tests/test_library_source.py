@@ -1,3 +1,4 @@
+# tests/test_library_source.py
 from unittest.mock import Mock
 
 import pytest
@@ -22,6 +23,20 @@ def test_uses_server_games_when_available(monkeypatch):
 
     assert result == server_games
     fallback.games.assert_not_called()
+
+
+def test_skips_server_when_use_server_is_false(monkeypatch):
+    fetch_mock = Mock()
+    monkeypatch.setattr("library_source.fetch_games", fetch_mock)
+
+    fallback = Mock()
+    fallback.games.return_value = [make_game("From File")]
+
+    result = games(server_port=38217, include_hidden=True, fallback=fallback, use_server=False)
+
+    assert result == [make_game("From File")]
+    fetch_mock.assert_not_called()
+    fallback.games.assert_called_once_with(include_hidden=True)
 
 
 def test_falls_back_when_server_unavailable(monkeypatch):

@@ -1,17 +1,29 @@
+# src/plugin/__main__.py
+from __future__ import annotations
+
 from litedb_py import LiteDbError
 from pyflowlauncher import Plugin
 
 from library_server import DEFAULT_PORT as DEFAULT_LIBRARY_SERVER_PORT
 from library_source import games as library_source_games
+from matcher import match_and_rank_games
 from playnite import DEFAULT_DATA_DIR, LibraryLocked, LibraryNotFound, PlayniteLibrary, PlayniteNotFound
 from results import build_context_menu, build_result, error_result, library_locked_result
-from settings import as_bool
+from settings import should_show_hidden, should_show_uninstalled, should_use_library_server
 
 plugin = Plugin()
 
+_cached_library_path: str | None = None
+_cached_library: PlayniteLibrary | None = None
+
 
 def library() -> PlayniteLibrary:
-    return PlayniteLibrary(plugin.settings.get("playnite_path") or DEFAULT_DATA_DIR)
+    global _cached_library_path, _cached_library
+    configured_path = plugin.settings.get("playnite_path") or DEFAULT_DATA_DIR
+    if _cached_library is None or configured_path != _cached_library_path:
+        _cached_library = PlayniteLibrary(configured_path)
+        _cached_library_path = configured_path
+    return _cached_library
 
 
 def library_server_port() -> int:
@@ -21,8 +33,16 @@ def library_server_port() -> int:
         return DEFAULT_LIBRARY_SERVER_PORT
 
 
-def hide_uninstalled() -> bool:
-    return as_bool(plugin.settings.get("hide_uninstalled"), default=True)
+def show_uninstalled() -> bool:
+    return should_show_uninstalled(plugin.settings)
+
+
+def show_hidden() -> bool:
+    return should_show_hidden(plugin.settings)
+
+
+def use_library_server() -> bool:
+    return should_use_library_server(plugin.settings)
 
 
 @plugin.on_method
@@ -31,8 +51,9 @@ async def query(query: str):
     try:
         games = library_source_games(
             server_port=library_server_port(),
-            include_hidden=as_bool(plugin.settings.get("show_hidden")),
+            include_hidden=show_hidden(),
             fallback=lib,
+            use_server=use_library_server(),
         )
         # Read eagerly, inside the try: when games come from the live server,
         # lib.games() is never called, so this is the only place a bad
@@ -53,15 +74,11 @@ async def query(query: str):
     except OSError as error:
         yield error_result("Could not read the Playnite library", str(error))
         return
-    if hide_uninstalled():
+
+    if not show_uninstalled():
         games = [game for game in games if game.is_installed]
-    for game in games:
-        score = 0
-        if query:
-            match = await plugin.launcher.api.fuzzy_search(query, game.name)
-            if match.score < match.score_cutoff:
-                continue
-            score = int(match.score)
+
+    for game, score in match_and_rank_games(games, query):
         yield build_result(game, files_dir, score)
 
 

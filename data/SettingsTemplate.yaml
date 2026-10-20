@@ -1,3 +1,4 @@
+# data/SettingsTemplate.yaml
 body:
   - type: textBlock
     attributes:
@@ -10,21 +11,30 @@ body:
       label: "Playnite Data Directory:"
       defaultValue: "%APPDATA%\\Playnite"
       description: Playnite data directory (the folder containing "library"). Change this for portable installs.
+  - type: checkbox
+    attributes:
+      name: show_hidden
+      label: "Show Hidden Games"
+      defaultValue: "true"
+      description: Include games marked hidden in Playnite.
+  - type: checkbox
+    attributes:
+      name: show_uninstalled
+      label: "Show Uninstalled Games"
+      defaultValue: "true"
+      description: Include uninstalled games in search results.
+  - type: separator
+    attributes:
+      name: server_separator
+  - type: checkbox
+    attributes:
+      name: use_library_server
+      label: "Use Live Library Server"
+      defaultValue: "false"
+      description: Fetch live library data from the playnite-library-server extension while Playnite runs.
   - type: input
     attributes:
       name: library_server_port
       label: "Live Library Server Port:"
       defaultValue: "38217"
-      description: Port the playnite-library-server extension listens on. Only needed if you changed it from the extension's default.
-  - type: checkbox
-    attributes:
-      name: show_hidden
-      label: "Show Hidden Games"
-      defaultValue: "false"
-      description: Include games marked hidden in Playnite.
-  - type: checkbox
-    attributes:
-      name: hide_uninstalled
-      label: "Hide Uninstalled Games"
-      defaultValue: "true"
-      description: Only show installed games in search results.
+      description: Port the playnite-library-server extension listens on (only used when Use Live Library Server is enabled).

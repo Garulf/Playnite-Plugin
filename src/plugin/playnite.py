@@ -1,3 +1,4 @@
+# src/plugin/playnite.py
 from __future__ import annotations
 
 import os
@@ -6,6 +7,7 @@ import shutil
 import tempfile
 from dataclasses import dataclass, field
 from datetime import datetime
+from functools import lru_cache
 from pathlib import Path
 
 from litedb_py import LiteDatabase, LiteDbError
@@ -21,11 +23,16 @@ def show_game_uri(game_id: str) -> str:
     return f"{PLAYNITE_URI_BASE}/showgame/{game_id}"
 
 
+@lru_cache(maxsize=4096)
+def _cached_media_path(files_dir: Path, relative: str) -> Path | None:
+    path = Path(files_dir, *relative.split("\\"))
+    return path if path.is_file() else None
+
+
 def media_path(files_dir: Path, relative: str | None) -> Path | None:
     if not relative:
         return None
-    path = Path(files_dir, *relative.split("\\"))
-    return path if path.is_file() else None
+    return _cached_media_path(files_dir, relative)
 
 
 def format_playtime(seconds: int) -> str | None:
@@ -58,6 +65,16 @@ def _normalize_links(raw_links, name_key: str, url_key: str) -> list[dict]:
     ]
 
 
+def _compute_sort_key(
+    name_lower: str,
+    playtime: int,
+    last_activity: datetime | None,
+) -> tuple[int, float, int, str]:
+    if isinstance(last_activity, datetime):
+        return (-1, -last_activity.timestamp(), -playtime, name_lower)
+    return (0, 0.0, -playtime, name_lower)
+
+
 @dataclass(frozen=True)
 class Game:
     id: str
@@ -71,6 +88,18 @@ class Game:
     last_activity: datetime | None = None
     links: list[dict] = field(default_factory=list)
     source: str | None = None
+    name_lower: str = field(init=False, repr=False, compare=False)
+    sort_key: tuple[int, float, int, str] = field(init=False, repr=False, compare=False)
+
+    def __post_init__(self) -> None:
+        lowered = self.name.lower() if isinstance(self.name, str) else str(self.name).lower()
+        playtime_val = int(self.playtime) if isinstance(self.playtime, (int, float)) else 0
+        object.__setattr__(self, "name_lower", lowered)
+        object.__setattr__(
+            self,
+            "sort_key",
+            _compute_sort_key(lowered, playtime_val, self.last_activity),
+        )
 
     @classmethod
     def from_doc(cls, doc: dict, source_names: dict) -> Game:
@@ -151,6 +180,10 @@ class PlayniteLibrary:
     def __init__(self, data_dir: "str | os.PathLike" = DEFAULT_DATA_DIR, cache_dir: "str | os.PathLike | None" = None):
         self.data_dir = Path(os.path.expandvars(str(data_dir)))
         self.cache_dir = Path(cache_dir) if cache_dir else Path(tempfile.gettempdir(), CACHE_DIR_NAME)
+        self._cached_sources_key: Path | None = None
+        self._cached_sources: dict = {}
+        self._cached_games_key: tuple[Path, Path | None] | None = None
+        self._cached_game_subsets: dict[tuple[bool, bool], list[Game]] = {}
 
     @property
     def library_dir(self) -> Path:
@@ -193,20 +226,41 @@ class PlayniteLibrary:
     def source_names(self) -> dict:
         path = self.library_dir / "sources.db"
         if not path.is_file():
+            self._cached_sources_key = None
+            self._cached_sources = {}
             return {}
         try:
-            with LiteDatabase(self.cached_copy(path)) as db:
-                return {
+            cached_path = self.cached_copy(path)
+            if cached_path == self._cached_sources_key:
+                return dict(self._cached_sources)
+            with LiteDatabase(cached_path) as db:
+                sources = {
                     doc["_id"]: doc["Name"]
                     for name in db.collections
                     for doc in db[name]
                     if "_id" in doc and isinstance(doc.get("Name"), str)
                 }
+            self._cached_sources_key = cached_path
+            self._cached_sources = sources
+            return dict(sources)
         except LiteDbError:
             return {}
 
-    def games(self, include_hidden: bool = False) -> "list[Game]":
+    def games(self, include_hidden: bool = False, include_uninstalled: bool = True) -> "list[Game]":
         sources = self.source_names()
-        with LiteDatabase(self.cached_copy(self.games_db)) as db:
-            games = [Game.from_doc(doc, sources) for doc in db["Game"]]
-        return [game for game in games if include_hidden or not game.hidden]
+        cached_games_path = self.cached_copy(self.games_db)
+        cache_key = (cached_games_path, self._cached_sources_key)
+        if cache_key != self._cached_games_key:
+            with LiteDatabase(cached_games_path) as db:
+                all_games = [Game.from_doc(doc, sources) for doc in db["Game"]]
+            all_games.sort(key=lambda game: game.sort_key)
+            visible_games = [game for game in all_games if not game.hidden]
+            self._cached_game_subsets = {
+                (True, True): all_games,
+                (False, True): visible_games,
+                (True, False): [game for game in all_games if game.is_installed],
+                (False, False): [game for game in visible_games if game.is_installed],
+            }
+            self._cached_games_key = cache_key
+            _cached_media_path.cache_clear()
+        return list(self._cached_game_subsets[(bool(include_hidden), bool(include_uninstalled))])

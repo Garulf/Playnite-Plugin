@@ -1,3 +1,4 @@
+# src/plugin/library_server.py
 from __future__ import annotations
 
 import json
@@ -6,6 +7,7 @@ import urllib.request
 
 from playnite import Game
 
+DEFAULT_HOST = "127.0.0.1"
 DEFAULT_PORT = 38217
 DEFAULT_TIMEOUT = 0.3
 EXTENSION_URL = "https://github.com/Garulf/playnite-library-server/releases/latest"
@@ -15,9 +17,15 @@ class LibraryServerUnavailable(Exception):
     pass
 
 
-def fetch_games(port: int = DEFAULT_PORT, include_hidden: bool = False, timeout: float = DEFAULT_TIMEOUT) -> "list[Game]":
+def fetch_games(
+    port: int = DEFAULT_PORT,
+    include_hidden: bool = False,
+    timeout: float = DEFAULT_TIMEOUT,
+) -> "list[Game]":
     hidden_param = "true" if include_hidden else "false"
-    url = f"http://localhost:{port}/games?hidden={hidden_param}"
+    # Use 127.0.0.1 instead of localhost so Windows does not attempt both IPv6 (::1)
+    # and IPv4 (127.0.0.1) sequentially when the server is not listening.
+    url = f"http://{DEFAULT_HOST}:{port}/games?hidden={hidden_param}"
     try:
         with urllib.request.urlopen(url, timeout=timeout) as response:
             if response.status != 200:
