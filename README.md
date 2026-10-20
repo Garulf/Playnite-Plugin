@@ -57,7 +57,8 @@ reading `games.db` as before, no configuration needed.
 
 To set it up, download `PlayniteLibraryServer_<version>.pext` from the extension's
 [latest release](https://github.com/Garulf/playnite-library-server/releases/latest), open it with
-Playnite (or drag it onto the Playnite window), and restart Playnite.
+Playnite (or drag it onto the Playnite window), restart Playnite, and enable **Use Live Library Server**
+in the plugin's settings.
 
 If you've changed the extension's port from its default (`38217`), set it in the plugin's
 settings via `library_server_port`.

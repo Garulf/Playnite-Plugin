@@ -1,3 +1,4 @@
+# src/plugin/results.py
 from __future__ import annotations
 
 from pathlib import Path
@@ -10,9 +11,16 @@ from pyflowlauncher.models.result import PreviewInfo
 from library_server import EXTENSION_URL as LIBRARY_SERVER_EXTENSION_URL
 from playnite import Game, game_subtitle, media_path, show_game_uri, start_uri
 
+_UNRESOLVED = object()
 
-def context_payload(game: Game, files_dir: Path) -> dict:
-    icon = media_path(files_dir, game.icon)
+
+def context_payload(
+    game: Game,
+    files_dir: Path,
+    *,
+    resolved_icon: Path | None | object = _UNRESOLVED,
+) -> dict:
+    icon = media_path(files_dir, game.icon) if resolved_icon is _UNRESOLVED else resolved_icon
     return {
         "id": game.id,
         "name": game.name,
@@ -25,6 +33,7 @@ def context_payload(game: Game, files_dir: Path) -> dict:
 
 def build_result(game: Game, files_dir: Path, score: int = 0) -> Result:
     uri = game.start_uri if game.is_installed else game.show_game_uri
+    icon = media_path(files_dir, game.icon)
     cover = media_path(files_dir, game.cover_image)
     preview = PreviewInfo(
         PreviewImagePath=str(cover) if cover else None,
@@ -35,11 +44,11 @@ def build_result(game: Game, files_dir: Path, score: int = 0) -> Result:
     return Result(
         title=game.name,
         subtitle=game_subtitle(game),
-        icon=media_path(files_dir, game.icon),
+        icon=icon,
         score=score,
         preview=preview,
         json_rpc_action=api.open_uri(uri),
-        context_data=[context_payload(game, files_dir)],
+        context_data=[context_payload(game, files_dir, resolved_icon=icon)],
     )
 
 

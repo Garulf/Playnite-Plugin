@@ -1,3 +1,4 @@
+# tests/test_library_server.py
 import json
 import urllib.error
 
@@ -129,3 +130,4 @@ def test_fetch_games_passes_hidden_query_param(monkeypatch):
     monkeypatch.setattr("library_server.urllib.request.urlopen", capture)
     fetch_games(port=38217, include_hidden=True)
     assert "hidden=true" in captured["url"]
+    assert "127.0.0.1" in captured["url"]

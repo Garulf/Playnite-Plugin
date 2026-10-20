@@ -1,7 +1,7 @@
-# run.py - generic shim, identical across all plugins
+# src/run.py
+import os
 import runpy
 import sys
-import os
 
 PLUGIN_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), "plugin")
 
