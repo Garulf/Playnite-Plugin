@@ -151,6 +151,7 @@ class PlayniteLibrary:
     def __init__(self, data_dir: "str | os.PathLike" = DEFAULT_DATA_DIR, cache_dir: "str | os.PathLike | None" = None):
         self.data_dir = Path(os.path.expandvars(str(data_dir)))
         self.cache_dir = Path(cache_dir) if cache_dir else Path(tempfile.gettempdir(), CACHE_DIR_NAME)
+        self._loaded_games: "tuple[tuple[Path, Path | None], list[Game]] | None" = None
 
     @property
     def library_dir(self) -> Path:
@@ -190,23 +191,36 @@ class PlayniteLibrary:
             old.unlink(missing_ok=True)
         return cached
 
-    def source_names(self) -> dict:
+    def _sources_copy(self) -> "Path | None":
         path = self.library_dir / "sources.db"
-        if not path.is_file():
-            return {}
-        try:
-            with LiteDatabase(self.cached_copy(path)) as db:
-                return {
-                    doc["_id"]: doc["Name"]
-                    for name in db.collections
-                    for doc in db[name]
-                    if "_id" in doc and isinstance(doc.get("Name"), str)
-                }
-        except LiteDbError:
-            return {}
+        return self.cached_copy(path) if path.is_file() else None
+
+    def source_names(self) -> dict:
+        return _read_source_names(self._sources_copy())
 
     def games(self, include_hidden: bool = False) -> "list[Game]":
-        sources = self.source_names()
-        with LiteDatabase(self.cached_copy(self.games_db)) as db:
-            games = [Game.from_doc(doc, sources) for doc in db["Game"]]
-        return [game for game in games if include_hidden or not game.hidden]
+        snapshot = (self.cached_copy(self.games_db), self._sources_copy())
+        if self._loaded_games is None or self._loaded_games[0] != snapshot:
+            self._loaded_games = (snapshot, _read_games(*snapshot))
+        return [game for game in self._loaded_games[1] if include_hidden or not game.hidden]
+
+
+def _read_source_names(sources_copy: "Path | None") -> dict:
+    if sources_copy is None:
+        return {}
+    try:
+        with LiteDatabase(sources_copy) as db:
+            return {
+                doc["_id"]: doc["Name"]
+                for name in db.collections
+                for doc in db[name]
+                if "_id" in doc and isinstance(doc.get("Name"), str)
+            }
+    except LiteDbError:
+        return {}
+
+
+def _read_games(games_copy: Path, sources_copy: "Path | None") -> "list[Game]":
+    sources = _read_source_names(sources_copy)
+    with LiteDatabase(games_copy) as db:
+        return [Game.from_doc(doc, sources) for doc in db["Game"]]
