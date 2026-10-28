@@ -85,3 +85,17 @@ async def test_query_suggests_library_server_when_playnite_locks_library(monkeyp
 
     assert len(results) == 1
     assert "playnite-library-server" in results[0].title
+
+
+def test_library_is_reused_until_playnite_path_changes(monkeypatch, tmp_path):
+    main = load_main()
+    fake_launcher = Mock()
+    fake_launcher.settings = {"playnite_path": str(tmp_path / "a")}
+    monkeypatch.setattr(main.plugin, "_launcher", fake_launcher)
+
+    first = main.library()
+    assert main.library() is first
+
+    fake_launcher.settings["playnite_path"] = str(tmp_path / "b")
+    assert main.library() is not first
+    assert main.library().data_dir == tmp_path / "b"

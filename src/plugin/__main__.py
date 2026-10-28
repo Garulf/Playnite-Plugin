@@ -1,3 +1,5 @@
+from functools import lru_cache
+
 from litedb_py import LiteDbError
 from pyflowlauncher import Plugin
 
@@ -10,8 +12,13 @@ from settings import as_bool
 plugin = Plugin()
 
 
+@lru_cache(maxsize=1)
+def library_at(data_dir: str) -> PlayniteLibrary:
+    return PlayniteLibrary(data_dir)
+
+
 def library() -> PlayniteLibrary:
-    return PlayniteLibrary(plugin.settings.get("playnite_path") or DEFAULT_DATA_DIR)
+    return library_at(plugin.settings.get("playnite_path") or DEFAULT_DATA_DIR)
 
 
 def library_server_port() -> int:
