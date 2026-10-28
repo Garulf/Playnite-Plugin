@@ -1,5 +1,12 @@
 # Changelog
 
+## [3.3.2](https://github.com/Garulf/Playnite-Plugin/compare/v3.3.1...v3.3.2) (2026-10-28)
+
+
+### Performance Improvements
+
+* keep the parsed library in memory between queries ([#77](https://github.com/Garulf/Playnite-Plugin/issues/77)) ([1e45b41](https://github.com/Garulf/Playnite-Plugin/commit/1e45b412aef78f246bec0037071f13f45b92f835))
+
 ## [3.3.1](https://github.com/Garulf/Playnite-Plugin/compare/v3.3.0...v3.3.1) (2026-10-14)
 
 
