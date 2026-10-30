@@ -15,3 +15,16 @@ jobs:
           python-version: "3.12"
       - run: uv sync
       - run: uv run pytest -v
+
+  vendored-oldest-python:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - uses: astral-sh/setup-uv@v7
+      - name: Vendor requirements the way the release build does
+        run: uv pip install --python 3.12 --target "$RUNNER_TEMP/site-packages" -r requirements.txt
+      - name: Import the plugin on the oldest supported Python
+        run: >
+          uv run --no-project --python 3.9 python -I -c
+          "import runpy, sys; sys.path[:0] = [sys.argv[1], 'src/plugin']; runpy.run_path('src/plugin/__main__.py', run_name='vendored_import_check')"
+          "$RUNNER_TEMP/site-packages"

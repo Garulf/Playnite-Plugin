@@ -1,2 +1,5 @@
 pyflowlauncher==1.2.2
 litedb-py @ git+https://github.com/Garulf/litedb-py@aa0eae5642cce272bcb68e1bad294cf3419c2f5a
+# The release vendors these on Python 3.12, which skips pyflowlauncher's
+# python_version < "3.11" marker, but users may run Flow on Python 3.9 or 3.10.
+typing_extensions>=4.8.0
