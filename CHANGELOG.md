@@ -1,5 +1,12 @@
 # Changelog
 
+## [3.3.3](https://github.com/Garulf/Playnite-Plugin/compare/v3.3.2...v3.3.3) (2026-10-30)
+
+
+### Bug Fixes
+
+* vendor typing_extensions so the plugin starts on Python 3.9 and 3.10 ([#80](https://github.com/Garulf/Playnite-Plugin/issues/80)) ([f14475b](https://github.com/Garulf/Playnite-Plugin/commit/f14475bdbe80d4d4d93d778e45e1c33d40a463e3)), closes [#79](https://github.com/Garulf/Playnite-Plugin/issues/79)
+
 ## [3.3.2](https://github.com/Garulf/Playnite-Plugin/compare/v3.3.1...v3.3.2) (2026-10-28)
 
 
